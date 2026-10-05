@@ -14,6 +14,8 @@ import android.view.View
 import android.widget.RemoteViews
 import androidx.core.app.NotificationCompat
 import androidx.core.graphics.drawable.toBitmap
+import org.staacks.alpharemote.selfie.SelfieState
+import org.staacks.alpharemote.selfie.SelfiePhase
 import org.staacks.alpharemote.MainActivity
 import org.staacks.alpharemote.R
 import org.staacks.alpharemote.camera.CameraAction
@@ -39,6 +41,7 @@ class NotificationUI(private val context: Context) {
     private var customButtons: List<CameraAction>? = null
     private var buttonSize: Float = 1.0f
     private var cameraState: CameraState? = null
+    private var selfieState = SelfieState()
     private var countDownTime: Long? = null
     private var countDownLabel: String? = null
 
@@ -70,7 +73,6 @@ class NotificationUI(private val context: Context) {
             notifyTimer?.cancel()
         } catch (_: IllegalStateException) {}
         notifyTimer = null
-        notificationManager?.deleteNotificationChannel(channelId)
         notificationManager = null
     }
 
@@ -89,6 +91,20 @@ class NotificationUI(private val context: Context) {
     }
 
     private fun createRemoteViews(): RemoteViews {
+        if (selfieState.running) {
+            return RemoteViews(context.packageName, R.layout.notification_selfie).apply {
+                val status = when (selfieState.phase) {
+                    SelfiePhase.COUNTDOWN -> context.getString(R.string.selfie_countdown_notification, selfieState.remainingSeconds)
+                    SelfiePhase.FOCUSING -> context.getString(R.string.selfie_focusing)
+                    SelfiePhase.SHOOTING -> context.getString(R.string.selfie_shooting)
+                    else -> context.getString(R.string.selfie_af_failed)
+                }
+                setTextViewText(R.id.selfie_notification_status, status)
+                setTextViewText(R.id.selfie_notification_progress, context.getString(
+                    R.string.selfie_progress, selfieState.attempts, selfieState.shots, selfieState.skipped))
+                setOnClickPendingIntent(R.id.selfie_notification_stop, stopIntent())
+            }
+        }
         val remoteViews = RemoteViews(context.packageName, R.layout.notification_controls)
 
         //Using a collection widget with a RemoteViewsService might be an interesting alternative,
@@ -225,6 +241,7 @@ class NotificationUI(private val context: Context) {
             .setSmallIcon(R.drawable.ic_camera_black_24dp)
             .setStyle(NotificationCompat.DecoratedCustomViewStyle())
             .setCustomContentView(remoteViews)
+            .addAction(R.drawable.ca_stop, context.getString(R.string.selfie_stop), stopIntent())
             .setOnlyAlertOnce(true)
             .setOngoing(true)
     }
@@ -252,6 +269,27 @@ class NotificationUI(private val context: Context) {
         val drawable = cameraAction.getIcon(context)
         drawable.setTint(color)
         return drawable.toBitmap((defaultButtonSize*buttonSize).roundToInt(), (defaultButtonSize*buttonSize).roundToInt())
+    }
+
+    private fun stopIntent(): PendingIntent = PendingIntent.getService(context, 1001,
+        Intent(context, AlphaRemoteService::class.java).setAction(AlphaRemoteService.SELFIE_STOP),
+        PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT)
+
+    fun onSelfieStateUpdate(state: SelfieState) {
+        selfieState = state
+        if (state.disconnected) {
+            notificationManager?.notify(2, NotificationCompat.Builder(context, channelId)
+                .setSmallIcon(R.drawable.ic_camera_black_24dp)
+                .setContentTitle(context.getString(R.string.app_name))
+                .setContentText(context.getString(R.string.selfie_disconnected))
+                .setContentIntent(PendingIntent.getActivity(context, 1002,
+                    Intent(context, MainActivity::class.java),
+                    PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT))
+                .setAutoCancel(true).build())
+        } else if (state.running) {
+            notificationManager?.cancel(2)
+        }
+        updateNotification()
     }
 
     fun updateCustomButtons(buttons: List<CameraAction>?, size: Float) {

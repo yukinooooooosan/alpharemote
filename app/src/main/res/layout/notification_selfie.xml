@@ -1,0 +1,15 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent" android:layout_height="wrap_content"
+    android:orientation="horizontal" android:gravity="center_vertical">
+    <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content"
+        android:layout_weight="1" android:orientation="vertical">
+        <TextView android:id="@+id/selfie_notification_status"
+            android:layout_width="match_parent" android:layout_height="wrap_content"
+            style="@style/TextAppearance.Compat.Notification.Title" />
+        <TextView android:id="@+id/selfie_notification_progress"
+            android:layout_width="match_parent" android:layout_height="wrap_content"
+            style="@style/TextAppearance.Compat.Notification" />
+    </LinearLayout>
+    <Button android:id="@+id/selfie_notification_stop" android:layout_width="wrap_content"
+        android:layout_height="48dp" android:text="@string/selfie_stop" />
+</LinearLayout>

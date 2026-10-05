@@ -40,7 +40,7 @@ class MainActivity : AppCompatActivity() {
 
         navView.setupWithNavController(navController)
 
-        var startPage = intent?.getIntExtra(NAVIGATE_TO_INTENT_EXTRA, R.id.navigation_camera) ?: R.id.navigation_camera
+        var startPage = intent?.getIntExtra(NAVIGATE_TO_INTENT_EXTRA, R.id.navigation_selfie) ?: R.id.navigation_selfie
         startPage = savedInstanceState?.getInt(SELECTED_PAGE, startPage) ?: startPage
         navigateTo(startPage)
 
@@ -54,7 +54,7 @@ class MainActivity : AppCompatActivity() {
     override fun onNewIntent(intent: Intent?) {
         super.onNewIntent(intent)
 
-        intent?.getIntExtra(NAVIGATE_TO_INTENT_EXTRA, R.id.navigation_camera)?.let {
+        intent?.getIntExtra(NAVIGATE_TO_INTENT_EXTRA, R.id.navigation_selfie)?.let {
             navigateTo(it)
         }
     }

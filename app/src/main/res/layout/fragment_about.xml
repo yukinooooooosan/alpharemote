@@ -35,6 +35,9 @@
             android:textAppearance="@style/TextAppearance.AppCompat.Display1" />
 
 
+        <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="16dp" android:text="@string/selfie_fork_credit" />
+        <Button android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/selfie_source" android:onClick="@{() -> fragment.openURL(@string/selfie_source_url)}" />
+
         <!-- Author -->
 
         <TextView

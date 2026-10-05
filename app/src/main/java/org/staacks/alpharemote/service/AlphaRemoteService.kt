@@ -10,6 +10,8 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.content.pm.ServiceInfo
 import android.content.res.Configuration
+import android.os.Handler
+import android.os.Looper
 import android.os.PowerManager
 import android.os.SystemClock
 import android.util.Log
@@ -28,6 +30,12 @@ import org.staacks.alpharemote.camera.CameraBLE
 import org.staacks.alpharemote.camera.CameraStateIdentified
 import org.staacks.alpharemote.camera.CameraStateReady
 import org.staacks.alpharemote.camera.WaitTarget
+import org.staacks.alpharemote.camera.ReportedBoolean
+import org.staacks.alpharemote.selfie.SelfieController
+import org.staacks.alpharemote.selfie.SelfieSettings
+import org.staacks.alpharemote.selfie.SelfieState
+import org.staacks.alpharemote.selfie.SelfieAudio
+import org.staacks.alpharemote.selfie.SelfieSound
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -59,6 +67,11 @@ class AlphaRemoteService : CompanionDeviceService() {
     private var timer: TimerTask? = null
     private var notificationUI: NotificationUI? = null
 
+    private val selfieHandler = Handler(Looper.getMainLooper())
+    private lateinit var selfieController: SelfieController
+    private var selfieAudio: SelfieAudio? = null
+    private var lastFocusReport: ReportedBoolean? = null
+
     private lateinit var pendingActionsWakeLock: PowerManager.WakeLock
 
     companion object {
@@ -68,6 +81,26 @@ class AlphaRemoteService : CompanionDeviceService() {
 
         private val _serviceState = MutableStateFlow<ServiceState>(ServiceStateGone())
         val serviceState: StateFlow<ServiceState> = _serviceState.asStateFlow()
+
+        private val _selfieState = MutableStateFlow(SelfieState())
+        val selfieState: StateFlow<SelfieState> = _selfieState.asStateFlow()
+        const val SELFIE_START = "SELFIE_START"
+        const val SELFIE_STOP = "SELFIE_STOP"
+        const val SELFIE_SETTINGS = "selfie_settings"
+
+        fun startSelfie(context: Context, settings: SelfieSettings): Boolean {
+            if ((serviceState.value as? ServiceRunning)?.cameraState !is CameraStateReady) return false
+            context.startService(Intent(context, AlphaRemoteService::class.java).apply {
+                action = SELFIE_START
+                putExtra(SELFIE_SETTINGS, settings)
+            })
+            return true
+        }
+
+        fun stopSelfie(context: Context) {
+            if (serviceState.value !is ServiceRunning) return
+            context.startService(Intent(context, AlphaRemoteService::class.java).setAction(SELFIE_STOP))
+        }
 
         fun disconnect() {
             cameraBLE?.disconnectFromDevice()
@@ -105,6 +138,35 @@ class AlphaRemoteService : CompanionDeviceService() {
         pendingActionsWakeLock = (getSystemService(POWER_SERVICE) as PowerManager).run {
             newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "AlphaRemoteService::PendingActionsWakeLock")
         }
+        selfieController = SelfieController(object : SelfieController.Port {
+            override fun nowMillis() = SystemClock.elapsedRealtime()
+            override fun connected() = cameraBLE?.cameraState?.value is CameraStateReady
+            override fun schedule(delayMillis: Long, callback: () -> Unit): SelfieController.Cancellation {
+                val runnable = Runnable(callback)
+                selfieHandler.postDelayed(runnable, delayMillis)
+                return SelfieController.Cancellation { selfieHandler.removeCallbacks(runnable) }
+            }
+            override fun send(step: CameraActionStep) {
+                if (step is CAButton && step.pressed && step.button == ButtonCode.SHUTTER_HALF) {
+                    lastFocusReport = (cameraBLE?.cameraState?.value as? CameraStateReady)?.focus
+                }
+                cameraBLE?.executeCameraActionStep(step)
+            }
+            override fun releaseAll() { releaseAllControls() }
+            @SuppressLint("WakelockTimeout")
+            override fun awake(enabled: Boolean) {
+                if (enabled && !pendingActionsWakeLock.isHeld) pendingActionsWakeLock.acquire()
+                if (!enabled && pendingActionsWakeLock.isHeld) pendingActionsWakeLock.release()
+            }
+            override fun sound(sound: SelfieSound) {
+                if (selfieAudio == null) selfieAudio = SelfieAudio()
+                selfieAudio?.play(sound)
+            }
+            override fun publish(state: SelfieState) {
+                _selfieState.value = state
+                notificationUI?.onSelfieStateUpdate(state)
+            }
+        }, this)
     }
 
     override fun onDeviceAppeared(address: String) {
@@ -149,20 +211,30 @@ class AlphaRemoteService : CompanionDeviceService() {
             deviceAppearedCount = 1
             cameraBLE = CameraBLE(scope, application, address, ::onConnect, ::onDisconnect).apply {
                 scope.launch {
-                    cameraState.collect {
-                        when (it) {
-                            is CameraStateReady -> checkWaitAction(it)
-                            is CameraStateIdentified -> settingsStore.setCameraId(it.name, it.address)
-                            else -> cancelPendingActionSteps()
+                    cameraState.collect { state ->
+                        synchronized(this@AlphaRemoteService) {
+                            _serviceState.update {
+                                (it as? ServiceRunning)?.copy(cameraState = state) ?: ServiceRunning(state, null, null)
+                            }
+                            notificationUI?.onCameraStateUpdate(state)
+                            when (state) {
+                                is CameraStateReady -> {
+                                    checkWaitAction(state)
+                                    if (state.focus !== lastFocusReport) {
+                                        lastFocusReport = state.focus
+                                        state.focus.lastChange?.let {
+                                            selfieController.onFocusReport(state.focus.state, it)
+                                        }
+                                    }
+                                }
+                                is CameraStateIdentified -> Unit
+                                else -> {
+                                    selfieController.disconnected()
+                                    cancelPendingActionSteps()
+                                }
+                            }
                         }
-                    }
-                }
-                scope.launch {
-                    cameraState.collectLatest { cameraState ->
-                        _serviceState.update {
-                            (it as? ServiceRunning)?.copy(cameraState = cameraState) ?: ServiceRunning(cameraState, null, null)
-                        }
-                        notificationUI?.onCameraStateUpdate(cameraState)
+                        if (state is CameraStateIdentified) settingsStore.setCameraId(state.name, state.address)
                     }
                 }
             }
@@ -186,6 +258,8 @@ class AlphaRemoteService : CompanionDeviceService() {
         deviceAppearedCount--
 
         if (deviceAppearedCount == 0) {
+            selfieController.disconnected()
+            cancelPendingActionSteps()
             cameraBLE?.disconnectFromDevice()
             cameraBLE = null
             if (pendingActionsWakeLock.isHeld) {
@@ -212,8 +286,10 @@ class AlphaRemoteService : CompanionDeviceService() {
         }
     }
 
+    @Synchronized
     private fun onDisconnect() {
         Log.d(MainActivity.TAG, "onDisconnect")
+        selfieController.disconnected()
         _serviceState.value = ServiceStateGone()
         cancelPendingActionSteps()
         stopForeground(STOP_FOREGROUND_REMOVE)
@@ -221,7 +297,9 @@ class AlphaRemoteService : CompanionDeviceService() {
         cameraBLE = null
     }
 
+    @Synchronized
     private fun executeCameraAction(cameraAction: CameraAction, down: Boolean, up: Boolean) {
+        if (selfieController.state.running && cameraAction.preset != CameraActionPreset.STOP) return
         var translatedUp = up
         var translatedDown = down
 
@@ -247,6 +325,16 @@ class AlphaRemoteService : CompanionDeviceService() {
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         Log.d(MainActivity.TAG, "onStartCommand: $intent")
         when (intent?.action) {
+            SELFIE_START -> synchronized(this) {
+                val options = intent.getSerializableExtra(SELFIE_SETTINGS) as? SelfieSettings
+                if (options != null && !selfieController.state.running && cameraBLE?.cameraState?.value is CameraStateReady) {
+                    cancelPendingActionSteps()
+                    // Mark cached focus before half-press; only subsequent reports can trigger capture.
+                    lastFocusReport = (cameraBLE?.cameraState?.value as? CameraStateReady)?.focus
+                    selfieController.start(options)
+                }
+            }
+            SELFIE_STOP -> cancelPendingActionSteps()
             BUTTON_INTENT_ACTION -> {
                 val cameraAction = intent.getSerializableExtra(BUTTON_INTENT_CAMERA_ACTION_EXTRA) as CameraAction
                 val down = intent.getBooleanExtra(BUTTON_INTENT_CAMERA_ACTION_DOWN_EXTRA, true)
@@ -255,6 +343,7 @@ class AlphaRemoteService : CompanionDeviceService() {
                 executeCameraAction(cameraAction, down, up)
             }
             ADVANCED_SEQUENCE_INTENT_ACTION -> {
+                if (selfieController.state.running) return START_NOT_STICKY
                 val bulbDuration = intent.getSerializableExtra(ADVANCED_SEQUENCE_INTENT_BULB_DURATION_EXTRA) as Float
                 val intervalDuration = intent.getSerializableExtra(ADVANCED_SEQUENCE_INTENT_INTERVAL_DURATION_EXTRA) as Float
                 val intervalCount = intent.getSerializableExtra(ADVANCED_SEQUENCE_INTENT_INTERVAL_COUNT_EXTRA) as Int
@@ -315,28 +404,41 @@ class AlphaRemoteService : CompanionDeviceService() {
         }
     }
 
+    override fun onDestroy() {
+        cancelPendingActionSteps()
+        selfieHandler.removeCallbacksAndMessages(null)
+        selfieAudio?.release()
+        selfieAudio = null
+        cameraBLE?.disconnectFromDevice()
+        cameraBLE = null
+        _serviceState.value = ServiceStateGone()
+        notificationUI?.stop()
+        job.cancelChildren()
+        super.onDestroy()
+    }
+
+    private fun releaseAllControls() {
+        // Always release, including manually toggled controls when there is no pending sequence.
+        for (button in ButtonCode.entries) cameraBLE?.executeCameraActionStep(CAButton(false, button))
+        for (jog in JogCode.entries) cameraBLE?.executeCameraActionStep(CAJog(false, -1, jog))
+    }
+
     @Synchronized
     fun cancelPendingActionSteps(): Boolean {
-        var pendingStepsCancelled = false
+        val selfieWasRunning = selfieController.state.running
+        val pendingStepsCancelled = pendingActionSteps.isNotEmpty() || selfieWasRunning
         timer?.cancel()
-        if (pendingActionSteps.isNotEmpty()) {
-            pendingActionSteps.clear()
-            for (button in ButtonCode.entries) {
-                cameraBLE?.executeCameraActionStep(CAButton(false, button))
-            }
-            for (jog in JogCode.entries) {
-                cameraBLE?.executeCameraActionStep(CAJog(false, -1, jog))
-            }
-            pendingStepsCancelled = true
-            updatePendingActionStatistics()
-        }
+        timer = null
+        pendingActionSteps.clear()
+        selfieController.stop()
+        if (!selfieController.state.disconnected) selfieAudio?.stop()
+        if (!selfieWasRunning) releaseAllControls()
+        updatePendingActionStatistics()
         _serviceState.update {
             (it as? ServiceRunning)?.copy(countdown = null, countdownLabel = null) ?: it
         }
         notificationUI?.hideCountdown()
-        if (pendingActionsWakeLock.isHeld) {
-            pendingActionsWakeLock.release()
-        }
+        if (pendingActionsWakeLock.isHeld) pendingActionsWakeLock.release()
         return pendingStepsCancelled
     }
 
@@ -354,7 +456,8 @@ class AlphaRemoteService : CompanionDeviceService() {
     @Synchronized
     @SuppressLint("WakelockTimeout")
     fun startCameraAction(steps: List<CameraActionStep>) {
-        if (cancelPendingActionSteps() && isLongRunningSequence(steps))
+        val needsCancel = steps.isEmpty() || pendingActionSteps.isNotEmpty() || selfieController.state.running
+        if (needsCancel && cancelPendingActionSteps() && isLongRunningSequence(steps))
             return //If this is more than a simple button press and there were pending action, this button press is only used as a cancellation of the previous sequence
         pendingActionSteps.addAll(steps)
         if (!pendingActionsWakeLock.isHeld) {
@@ -370,7 +473,7 @@ class AlphaRemoteService : CompanionDeviceService() {
             if (actionStep is CAButton && actionStep.isSequenceTrigger)
                 pendingTriggerCount++
         }
-        if (pendingActionSteps.isEmpty() && pendingActionsWakeLock.isHeld) {
+        if (pendingActionSteps.isEmpty() && !selfieController.state.running && pendingActionsWakeLock.isHeld) {
             pendingActionsWakeLock.release()
         }
         _serviceState.update {

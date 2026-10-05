@@ -1,6 +1,7 @@
 package org.staacks.alpharemote
 
 import android.content.Context
+import org.staacks.alpharemote.selfie.SelfieSettings
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.MutablePreferences
 import androidx.datastore.preferences.core.Preferences
@@ -25,6 +26,29 @@ val Context.settings: DataStore<Preferences> by preferencesDataStore(name = PREF
 
 class SettingsStore(context: Context) {
     private val settings = context.settings
+
+    private val selfieCountdownKey = intPreferencesKey("selfieCountdown")
+    private val selfieHoldKey = intPreferencesKey("selfieHold")
+    private val selfieCyclesKey = intPreferencesKey("selfieCycles")
+    private val selfieSoundKey = booleanPreferencesKey("selfieCountdownSound")
+
+    val selfieSettings: Flow<SelfieSettings> = settings.data.map { data ->
+        SelfieSettings(
+            countdownSeconds = data[selfieCountdownKey]?.takeIf { it in SelfieSettings.COUNTDOWNS } ?: 5,
+            holdMillis = data[selfieHoldKey]?.takeIf { it in SelfieSettings.HOLDS } ?: 1000,
+            cycles = data[selfieCyclesKey]?.takeIf { it in SelfieSettings.CYCLES } ?: 5,
+            countdownSound = data[selfieSoundKey] ?: true,
+        )
+    }.distinctUntilChanged()
+
+    suspend fun setSelfieSettings(options: SelfieSettings) {
+        settings.edit {
+            it[selfieCountdownKey] = options.countdownSeconds
+            it[selfieHoldKey] = options.holdMillis
+            it[selfieCyclesKey] = options.cycles
+            it[selfieSoundKey] = options.countdownSound
+        }
+    }
 
     private val notificationGrantedKey = booleanPreferencesKey("notificationGranted")
     private val bluetoothGrantedKey = booleanPreferencesKey("bluetoothGranted")

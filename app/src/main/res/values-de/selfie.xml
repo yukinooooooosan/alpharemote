@@ -1,0 +1,35 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <string name="selfie_connected">● Verbunden</string>
+    <string name="selfie_offline">○ Kamera nicht verbunden</string>
+    <string name="selfie_settings">Kamera und Verbindung</string>
+    <string name="selfie_delay">Wartezeit</string>
+    <string name="selfie_capture">Aufnahme</string>
+    <string name="selfie_cycles">Versuche</string>
+    <string name="selfie_seconds_3">3 s</string>
+    <string name="selfie_seconds_5">5 s</string>
+    <string name="selfie_seconds_10">10 s</string>
+    <string name="selfie_single">1 Bild</string>
+    <string name="selfie_hold_half">0,5 s</string>
+    <string name="selfie_hold_one">1 s</string>
+    <string name="selfie_hold_two">2 s</string>
+    <string name="selfie_cycles_one">1</string>
+    <string name="selfie_cycles_five">5</string>
+    <string name="selfie_cycles_ten">10</string>
+    <string name="selfie_sound">Countdown-Ton</string>
+    <string name="selfie_seconds_display" tools:ignore="PluralsCandidate">%1$d s</string>
+    <string name="selfie_ready">Handy ablegen und Position einnehmen.</string>
+    <string name="selfie_next_shot">Bis zur nächsten Aufnahme</string>
+    <string name="selfie_focus_hint">Die Kamera fokussiert auf deine aktuelle Position</string>
+    <string name="selfie_shoot_hint">Pose halten.</string>
+    <string name="selfie_af_failed">AF fehlgeschlagen · Versuch übersprungen</string>
+    <string name="selfie_disconnected">Die Kameraverbindung wurde getrennt. Nach dem Verbinden erneut START drücken.</string>
+    <string name="selfie_done">Aufnahmen beendet</string>
+    <string name="selfie_stopped">Gestoppt</string>
+    <string name="selfie_connection_hint">Die Kamera in den Einstellungen koppeln und die Bluetooth-Fernbedienung an der Kamera aktivieren.</string>
+    <string name="selfie_drive_hint">Für Serienaufnahmen die Kamera auf Serienbildmodus stellen. Für „1 Bild“ den Einzelbildmodus verwenden.</string>
+    <string name="selfie_sound_hint">AF-Fehler und Ende bleiben hörbar. Die Lautstärke wird über die Weckerlautstärke des Handys eingestellt.</string>
+    <string name="selfie_progress">Versuche %1$d · Auslösungen %2$d · Übersprungen %3$d</string>
+    <string name="selfie_countdown_notification">Aufnahme in %1$d s</string>
+    <string name="selfie_fork_credit">Diese App ist eine modifizierte Version von α-Remote von Sebastian Staacks (GPL-3.0). Sie ist keine offizielle Sony-App.</string>
+    <string name="selfie_source">Quellcode der modifizierten App</string>
+</resources>
