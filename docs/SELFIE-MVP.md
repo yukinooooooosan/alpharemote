@@ -1,4 +1,4 @@
-# Selfie Remote v0.1.3
+# Selfie Remote v0.1.4
 
 Sony αのBluetoothリモコン機能を使う、自撮り用Androidアプリ。
 Sebastian Staacksの[α-Remote](https://github.com/Staacks/alpharemote)をベースにしたGPL-3.0の改変版です。Sony公式アプリではありません。
@@ -33,7 +33,8 @@ AFタイムアウトはシャッターを解除して、エラー音を鳴らし
 
 ## 実装
 
-- XML / Material Components / ViewBindingの専用画面を起動時の画面にする。
+- 起動時のSELFIE画面をJetpack Composeに移行した。カメラ接続・取説・アプリ情報はXML / Material Components / ViewBindingを維持する。
+- UIは表示用状態とイベントだけを扱い、Fragmentが既存Service / ViewModelへ接続する。7つのサンプル状態×通常・ダークの`@Preview`はカメラ操作・Service起動・設定保存を行わない。
 - 画面はSELFIE・カメラ接続・取説・アプリ情報の4つ。接続画面には権限、登録・解除、接続ヘルプを残す。
 - 取説は通信なしで読める。準備・設定・AF失敗・音・STOP・切断時の案内を掲載する。
 - アプリ情報はアプリ名・バージョン・クレジット・GPL案内と元／改変プロジェクトへのリンクに整理する。GPL-3.0全文をAPK内に同梱し、オフラインのダイアログで表示する。
@@ -58,6 +59,7 @@ Android StudioまたはJava 21 / Android SDK 37.0を使う。
 APKのJava互換性は17のまま。Android 16相当のRobolectric起動テストにはJava 21が必要。Android 12（API 31）以上が必要。
 SDK Managerではパッケージ名 `platforms;android-37.0` を選ぶ。
 `local.properties` に `sdk.dir` を設定するか `ANDROID_HOME` を設定する。
+MacのAndroid StudioでCompose Previewを調整し、実機配布APKのビルドと署名は既存の鍵があるN100で行う。[環境準備・プレビュー・Git同期・N100でのビルド手順](MAC-N100-WORKFLOW.md)を参照。
 
 ```sh
 ./gradlew testDebugUnitTest assembleDebug lintDebug
@@ -70,6 +72,7 @@ adb install -r app/build/outputs/apk/debug/app-debug.apk
 ## 実機で確認する項目
 
 自動テストはシーケンスの論理を検証する。BLEとSony α本体の挙動は実機で確認する必要がある。
+Pixel 10 Proで**5秒待機・5枚撮影はユーザー確認済み**（Compose移行前、使用APK版は未記録）。網羅的な確認と、Compose版APKの実機確認は未完了。以下は詳細条件ごとのチェックであり、5秒・5枚の報告から推測して完了にしない。
 このリストを確認するまではMVPの完成判定とmainへのマージを行わない。
 
 - [ ] Android端末とカメラの機種・OS・ファームウェアを記録する。

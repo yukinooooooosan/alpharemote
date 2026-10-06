@@ -6,6 +6,7 @@ import android.app.Dialog
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Looper
+import androidx.compose.ui.platform.ComposeView
 import androidx.navigation.findNavController
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import org.junit.Assert.assertEquals
@@ -55,7 +56,7 @@ class StartupTest {
             checkLicenseDialog(activity)
             activity.navigateTo(R.id.navigation_selfie)
             shadowOf(Looper.getMainLooper()).idle()
-            assertNotNull(activity.findViewById<TextView>(R.id.start_stop))
+            assertNotNull(activity.findViewById<ComposeView>(R.id.selfie_compose_view))
             val receivers = activity.packageManager.getPackageInfo(activity.packageName,
                 PackageManager.GET_RECEIVERS).receivers.orEmpty()
             assertTrue(receivers.none { it.name.endsWith("CameraBroadcastReceiver") })
@@ -93,15 +94,14 @@ class StartupTest {
         val intent = Intent().putExtra(MainActivity.NAVIGATE_TO_INTENT_EXTRA, -1)
         Robolectric.buildActivity(MainActivity::class.java, intent).use { controller ->
             val activity = controller.setup().get()
-            assertNotNull(activity.findViewById<TextView>(R.id.start_stop))
+            assertNotNull(activity.findViewById<ComposeView>(R.id.selfie_compose_view))
         }
     }
 
     private fun checkLauncherScreen() {
         Robolectric.buildActivity(MainActivity::class.java).use { controller ->
             val activity = controller.setup().get()
-            assertNotNull(activity.findViewById<TextView>(R.id.phase_display))
-            assertNotNull(activity.findViewById<TextView>(R.id.start_stop))
+            assertNotNull(activity.findViewById<ComposeView>(R.id.selfie_compose_view))
         }
     }
 }

@@ -1,6 +1,6 @@
 # 開発版の検証記録
 
-2026-10-06、実機確認は後回しとする方針で検証した。
+2026-10-06更新。初期の自動検証は実機確認を後回しにして行った。その後、ユーザーのPixel 10 Proで5秒待機・5枚撮影の成功が報告された。使用APK版の詳細は未記録。網羅的な実機確認は未完了で、以下の各版の「未検証」はその版の作成時点の記録。
 
 ## 0.1.0の自動検証
 
@@ -79,3 +79,23 @@ versionCodeは4、versionNameは0.1.3。
 - 同梱GPLテキストとrootのLICENSE：同一。
 - APK署名検証：成功。前の版と同じ署名で上書きインストール可能。
 - `CameraBLE.kt` と `LICENSE`：上流から変更なし。実機撮影の検証は引き続き後回し。
+
+## 0.1.4：SELFIE画面だけをComposeへ移行
+
+SELFIEをComposeView内のCompose / Material 3画面に置き換えた。カメラ接続・取説・アプリ情報と下部ナビゲーションは既存XMLのまま。
+Fragmentがライフサイクルに合わせてService / ViewModelの状態を収集し、表示とイベントだけを扱う`SelfieScreen`へ渡す。
+`SelfiePreview`は7状態のサンプルと空のイベント処理を使い、通常・ダークの14通りを生成する。カメラ操作・Service起動・設定保存・タイマー処理はプレビューから呼ばない。
+Macでプレビュー調整、N100でテスト・APKビルド・署名を行う[手順書](MAC-N100-WORKFLOW.md)を追加した。versionCodeは5、versionNameは0.1.4。
+
+- `testDebugUnitTest assembleDebug lintDebug --no-daemon`：成功。
+- 全40件成功、失敗・エラー・スキップ0件。既存24件にCompose画面12件とFragmentの接続案内／ナビゲーション4件を追加。
+- API 31 / 36のRobolectricで7状態×通常・ダークを描画し、状態表示、START / STOP、実行中の設定非表示、終了時の回数表示を確認した。
+- 設定イベント、復元待ちのSTART無効化とSTOP有効化、切断時のSTARTへの復帰、実際の`SelfiePreview`をクリックしてもServiceや設定へ影響しないことを確認した。
+- 実アプリの未接続STARTが接続案内を表示し、接続ボタンが既存XML画面へ遷移することを確認した。4画面間の移動とGPLダイアログの起動テストも維持。
+- Android lint：エラー0件、警告79件。主に上流の未使用リソースと非推奨API等。Compose画面ソースへのlint指摘なし。
+- APK署名検証：成功。証明書SHA-256は既存APKと同じ `c8a131c390f88da5600d8163649eaf721fccfaf66898776756d38263d2b6d0e1`。アプリIDも維持し、上書き可能。
+- Java 21、Gradle 9.8.0、AGP 9.4.1、Kotlin / Compose Compiler 2.4.20、Compose BOM 2026.09.00、compile / target SDK 37。アプリのJVMターゲットは17。
+- 今回の差分にBLE、Service、撮影Controller、SelfieViewModel、既存XMLの3画面の変更なし。`CameraBLE.kt`と`LICENSE`は上流から変更なし。同梱GPLテキストもLICENSEと同一。
+
+**実機確認の現状：** ユーザーがPixel 10 Proで5秒待機・5枚撮影を確認済み。Compose移行前の報告で、使用APK版とカメラ設定の詳細は未記録。網羅的な実機確認は未完了。
+新しいCompose版APKの実機動作とMacのAndroid Studio上でのPreview表示は、このN100環境では検証していない。Robolectricの描画確認とIDEの実操作確認は区別する。実機チェックリストは未確認の詳細条件を残し、mainへはマージしない。
