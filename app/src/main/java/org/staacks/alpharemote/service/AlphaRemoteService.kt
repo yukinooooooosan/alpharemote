@@ -9,7 +9,6 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.content.pm.ServiceInfo
-import android.content.res.Configuration
 import android.os.Handler
 import android.os.Looper
 import android.os.PowerManager
@@ -41,14 +40,11 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancelChildren
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import org.staacks.alpharemote.camera.CameraActionPreset
 import org.staacks.alpharemote.camera.JogCode
 import org.staacks.alpharemote.ui.settings.CompanionDeviceHelper
 import java.io.Serializable
@@ -56,7 +52,6 @@ import java.util.LinkedList
 import java.util.Timer
 import java.util.TimerTask
 import kotlin.concurrent.schedule
-import kotlin.math.max
 import kotlin.math.roundToLong
 
 
@@ -130,7 +125,6 @@ class AlphaRemoteService : CompanionDeviceService() {
         const val ADVANCED_SEQUENCE_INTENT_FOCUS_BRACKETING_AMOUNT_EXTRA = "focus_step"
 
         private var pendingActionSteps = LinkedList<CameraActionStep>()
-        var broadcastControl = false
     }
 
     override fun onCreate() {
@@ -189,19 +183,9 @@ class AlphaRemoteService : CompanionDeviceService() {
         val settingsStore = SettingsStore(application)
         notificationUI = notificationUI ?: (NotificationUI(applicationContext).also { notificationUI ->
             scope.launch {
-                settingsStore.customButtonSettings.stateIn(
-                    scope = this,
-                    started = SharingStarted.WhileSubscribed(5000),
-                    initialValue = SettingsStore.CustomButtonSettings(null, 1.0f)
-                ).collectLatest {
-                    notificationUI.updateCustomButtons(it.customButtonList, it.scale)
-                }
-            }
-            scope.launch {
                 settingsStore.permissions.collectLatest {
                     if (it.notification) //Refresh notification if notification permission has been granted after it was not granted previously
                         notificationUI.updateNotification()
-                    broadcastControl = it.broadcastControl
                 }
             }
         })
@@ -297,31 +281,6 @@ class AlphaRemoteService : CompanionDeviceService() {
         cameraBLE = null
     }
 
-    @Synchronized
-    private fun executeCameraAction(cameraAction: CameraAction, down: Boolean, up: Boolean) {
-        if (selfieController.state.running && cameraAction.preset != CameraActionPreset.STOP) return
-        var translatedUp = up
-        var translatedDown = down
-
-        // Translate toggle release to down or up depending on button state
-        if (cameraAction.toggle) {
-            translatedDown = false // Toggle only acts on button release. Do not pass through down events
-            if (translatedUp) {
-                ((serviceState.value as? ServiceRunning)?.cameraState as? CameraStateReady)?.let { cameraState ->
-                    translatedUp = cameraAction.preset.template.referenceButton in cameraState.pressedButtons
-                    translatedDown = !translatedUp
-                }
-            }
-        }
-
-        if (translatedDown && translatedUp) //Simple click, i.e. button in notification area
-            startCameraAction(cameraAction.getClickStepList(this))
-        else if (translatedDown) //Button released
-            startCameraAction(cameraAction.getPressStepList(this))
-        else if (translatedUp) //Button pressed
-            startCameraAction(cameraAction.getReleaseStepList())
-    }
-
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         Log.d(MainActivity.TAG, "onStartCommand: $intent")
         when (intent?.action) {
@@ -335,73 +294,9 @@ class AlphaRemoteService : CompanionDeviceService() {
                 }
             }
             SELFIE_STOP -> cancelPendingActionSteps()
-            BUTTON_INTENT_ACTION -> {
-                val cameraAction = intent.getSerializableExtra(BUTTON_INTENT_CAMERA_ACTION_EXTRA) as CameraAction
-                val down = intent.getBooleanExtra(BUTTON_INTENT_CAMERA_ACTION_DOWN_EXTRA, true)
-                val up = intent.getBooleanExtra(BUTTON_INTENT_CAMERA_ACTION_UP_EXTRA, true)
-
-                executeCameraAction(cameraAction, down, up)
-            }
-            ADVANCED_SEQUENCE_INTENT_ACTION -> {
-                if (selfieController.state.running) return START_NOT_STICKY
-                val bulbDuration = intent.getSerializableExtra(ADVANCED_SEQUENCE_INTENT_BULB_DURATION_EXTRA) as Float
-                val intervalDuration = intent.getSerializableExtra(ADVANCED_SEQUENCE_INTENT_INTERVAL_DURATION_EXTRA) as Float
-                val intervalCount = intent.getSerializableExtra(ADVANCED_SEQUENCE_INTENT_INTERVAL_COUNT_EXTRA) as Int
-                val focusBracketingAmount = intent.getSerializableExtra(ADVANCED_SEQUENCE_INTENT_FOCUS_BRACKETING_AMOUNT_EXTRA) as Float
-
-                val stepSequencePrepare: MutableList<CameraActionStep> = mutableListOf()
-                stepSequencePrepare += CAButton(pressed = true, ButtonCode.SHUTTER_HALF)
-                if (intervalDuration > 0) {
-                    stepSequencePrepare += CACountdown(getString(R.string.camera_advanced_interval_timer_label), intervalDuration)
-                }
-
-                val stepSequenceTrigger: MutableList<CameraActionStep> = mutableListOf()
-                stepSequenceTrigger += CAButton(pressed = true, ButtonCode.SHUTTER_FULL, isSequenceTrigger = true)
-                if (bulbDuration > 0) {
-                    stepSequenceTrigger += CAWaitFor(WaitTarget.SHUTTER)
-                }
-                stepSequenceTrigger += CAButton(pressed = false, ButtonCode.SHUTTER_FULL)
-                stepSequenceTrigger += CAButton(pressed = false, ButtonCode.SHUTTER_HALF)
-                if (bulbDuration > 0) {
-                    stepSequenceTrigger += listOf(
-                        CACountdown(getString(R.string.camera_advanced_bulb_timer_label), bulbDuration),
-                        CAButton(pressed = true, ButtonCode.SHUTTER_HALF),
-                        CAButton(pressed = true, ButtonCode.SHUTTER_FULL),
-                        CAButton(pressed = false, ButtonCode.SHUTTER_FULL),
-                        CAButton(pressed = false, ButtonCode.SHUTTER_HALF),
-                    )
-                }
-
-                val focusSequence = if (focusBracketingAmount > 0) {
-                    listOf(
-                        CAWaitFor(WaitTarget.SHUTTER, true), //Wait for the exposure to finish
-                        CAButton(pressed = true, ButtonCode.SHUTTER_HALF), //Dismiss immediate preview by half pressing shutter
-                        CAButton(pressed = false, ButtonCode.SHUTTER_HALF),
-                        CAJog(true, JogCode.FOCUS_FAR.maxStep, JogCode.FOCUS_FAR),
-                        CACountdown(getString(R.string.camera_advanced_focus_bracketing_timer_label), focusBracketingAmount),
-                        CAJog(false, JogCode.FOCUS_FAR.maxStep, JogCode.FOCUS_FAR)
-                    )
-                } else listOf()
-
-                startCameraAction(
-                    stepSequencePrepare + stepSequenceTrigger
-                            + List(max(intervalCount-1, 0)) {stepSequencePrepare + focusSequence + stepSequenceTrigger}.flatten()
-                )
-            }
         }
 
         return START_NOT_STICKY
-    }
-
-    override fun onConfigurationChanged(newConfig: Configuration) {
-        super.onConfigurationChanged(newConfig)
-        scope.launch {
-            SettingsStore(application).getCustomButtonList().let { customButtonList ->
-                SettingsStore(application).getNotificationButtonSize()?.let { notificationButtonSize ->
-                    notificationUI?.updateCustomButtons(customButtonList, notificationButtonSize)
-                }
-            }
-        }
     }
 
     override fun onDestroy() {
@@ -437,7 +332,6 @@ class AlphaRemoteService : CompanionDeviceService() {
         _serviceState.update {
             (it as? ServiceRunning)?.copy(countdown = null, countdownLabel = null) ?: it
         }
-        notificationUI?.hideCountdown()
         if (pendingActionsWakeLock.isHeld) pendingActionsWakeLock.release()
         return pendingStepsCancelled
     }
@@ -500,7 +394,6 @@ class AlphaRemoteService : CompanionDeviceService() {
             _serviceState.update {
                 (it as? ServiceRunning)?.copy(countdown = targetTime, countdownLabel = step.label) ?: it
             }
-            notificationUI?.showCountdown(targetTime, step.label)
             return
         }
         (serviceState.value as? ServiceRunning)?.let {
@@ -515,7 +408,6 @@ class AlphaRemoteService : CompanionDeviceService() {
         _serviceState.update {
             (it as? ServiceRunning)?.copy(countdown = null, countdownLabel = null) ?: it
         }
-        notificationUI?.hideCountdown()
         val nextAction = pendingActionSteps.peek()
         if (nextAction is CACountdown) {
             pendingActionSteps.removeFirst()

@@ -31,7 +31,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/title_about"
+            android:text="@string/selfie_about_title"
             android:textAppearance="@style/TextAppearance.AppCompat.Display1" />
 
 

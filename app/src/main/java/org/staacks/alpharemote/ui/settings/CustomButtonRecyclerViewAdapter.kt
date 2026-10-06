@@ -16,6 +16,11 @@ import org.staacks.alpharemote.camera.CameraAction
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 
+interface CustomButtonListEventReceiver {
+    fun startDragging(viewHolder: RecyclerView.ViewHolder)
+    fun itemTouched(index: Int, oldCameraAction: CameraAction)
+}
+
 @SuppressLint("NotifyDataSetChanged")
 class CustomButtonRecyclerViewAdapter(private val dataSet: MutableStateFlow<List<CameraAction>?>, lifecycleOwner: LifecycleOwner, private val customButtonListEventReceiver: CustomButtonListEventReceiver) :
     RecyclerView.Adapter<CustomButtonRecyclerViewAdapter.ViewHolder>() {

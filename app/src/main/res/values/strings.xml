@@ -30,35 +30,35 @@
     <string name="camera_advanced_start">Start</string>
     <string name="camera_advanced_abort">Abort</string>
 
-    <string name="permission_bluetooth_rationale">As the app communicates with the camera via Bluetooth it needs permission to use Bluetooth.</string>
-    <string name="permission_notification_rationale">If you want to control your camera from the notification area, you need to allow this app to show notifications.</string>
+    <string name="permission_bluetooth_rationale">カメラとBluetoothで通信するため、「付近のデバイス」の権限が必要です。</string>
+    <string name="permission_notification_rationale">撮影状況とSTOPを通知に表示するため、通知の権限が必要です。</string>
 
-    <string name="settings_bluetooth_disabled">Bluetooth is currently disabled. Please turn on Bluetooth to use this app.</string>
-    <string name="settings_location_service_disabled">Location Services are currently disabled. This might not be an issue on some devices, but if you cannot connect to your camera, please try enabling Location Services in your Android settings.</string>
-    <string name="settings_ble_scanning_disabled">Bluetooth scanning is currently disabled, which will very likely prevent your phone from detecting the camera. Please check for \"Bluetooth Scanning\" within \"Location Services\" of your Android settings.</string>
+    <string name="settings_bluetooth_disabled">スマホのBluetoothをONにしてください。</string>
+    <string name="settings_location_service_disabled">接続できない場合は、スマホの位置情報をONにしてみてください。</string>
+    <string name="settings_ble_scanning_disabled">カメラを検出できるように、スマホの「位置情報サービス」で「Bluetoothのスキャン」をONにしてください。</string>
 
-    <string name="settings_missing_permission_title">Permission required</string>
-    <string name="settings_missing_notification_permission_warning">Warning: The app needs permission to show notifications. Without this permission, the remote works, but the buttons will not show up in your phone\'s notification area.</string>
-    <string name="settings_notification_permission_button">Allow notifications</string>
-    <string name="settings_missing_bluetooth_permission_warning">Error: The app communicates with your camera via Bluetooth. It cannot work unless you grant the permission to search for nearby devices.</string>
-    <string name="settings_bluetooth_permission_button">Allow Bluetooth</string>
+    <string name="settings_missing_permission_title">権限の確認</string>
+    <string name="settings_missing_notification_permission_warning">通知を許可すると、画面を閉じても撮影状況を確認でき、通知からSTOPできます。</string>
+    <string name="settings_notification_permission_button">通知を許可</string>
+    <string name="settings_missing_bluetooth_permission_warning">カメラに接続するには「付近のデバイス」の権限が必要です。</string>
+    <string name="settings_bluetooth_permission_button">Bluetoothを許可</string>
 
-    <string name="settings_camera">Camera</string>
-    <string name="settings_camera_offline">\"%s\" is offline.</string>
-    <string name="settings_camera_connected">Connected to \"%s\".</string>
-    <string name="settings_camera_error">Error: %s</string>
-    <string name="settings_camera_not_associated">The app is currently not associated with a camera.</string>
-    <string name="settings_camera_not_bonded">The app has been associated with a camera, but the pairing was not completed. Please connect the camera again and make sure to confirm the pairing with your phone on the camera.</string>
-    <string name="settings_camera_remote_disabled">Sending a command failed. Please verify that the setting \"Bluetooth remote control\" is enabled. This settings is a separate one from the pairing menu and it is sometimes even found in a different menu on some camera models.</string>
-    <string name="settings_camera_unknown_name">unknown</string>
+    <string name="settings_camera">接続状態</string>
+    <string name="settings_camera_offline">○ %1$s は未接続です。カメラの電源を入れてください。</string>
+    <string name="settings_camera_connected">● %1$s に接続済み</string>
+    <string name="settings_camera_error">接続エラー：%1$s</string>
+    <string name="settings_camera_not_associated">カメラが登録されていません。「カメラを追加」からペアリングしてください。</string>
+    <string name="settings_camera_not_bonded">ペアリングが完了していません。カメラを登録し直し、カメラ側でもペアリングを承認してください。</string>
+    <string name="settings_camera_remote_disabled">カメラ本体の「Bluetoothリモコン」がONになっているか確認してください。</string>
+    <string name="settings_camera_unknown_name">カメラ</string>
 
-    <string name="settings_camera_add">Add Camera</string>
-    <string name="settings_camera_add_info">1. Please check on your camera that the setting \"Bluetooth remote control\" is set to \"On\".\n\n2. Start Bluetooth pairing on your camera from the \"Bluetooth Settings\" menu.\n\n3. Press \"Search Camera\" below.\n\n4. Confirm pairing on camera (if prompted).</string>
-    <string name="settings_camera_add_confirm">Search Camera</string>
+    <string name="settings_camera_add">カメラを追加</string>
+    <string name="settings_camera_add_info">1. カメラの「Bluetoothリモコン」をONにします。\n\n2. カメラの「Bluetooth設定」からペアリングを開始します。\n\n3. 下の「カメラを探す」を押します。\n\n4. カメラ側で確認が表示されたら承認してください。</string>
+    <string name="settings_camera_add_confirm">カメラを探す</string>
 
-    <string name="settings_camera_remove">Remove Camera</string>
-    <string name="settings_camera_remove_question">Do you want to remove this camera from the app?</string>
-    <string name="settings_camera_remove_confirm">Remove Camera</string>
+    <string name="settings_camera_remove">登録を解除</string>
+    <string name="settings_camera_remove_question">このカメラの登録を解除しますか？</string>
+    <string name="settings_camera_remove_confirm">解除する</string>
 
     <string name="settings_custom_buttons">Custom buttons</string>
     <string name="settings_custom_buttons_explanation">Here you can define and edit custom buttons. Rearrange them by dragging the handle or remove buttons by dragging them to the side.</string>
@@ -114,7 +114,7 @@
 
     <string name="status_offline">Offline</string>
     <string name="status_error">Error</string>
-    <string name="status_connecting">Connecting…</string>
+    <string name="status_connecting">カメラに接続中…</string>
     <string name="status_focus">Focus status</string>
     <string name="status_shutter">Shutter status</string>
     <string name="status_recording">Recording status</string>
@@ -135,9 +135,9 @@
     <string name="action_name_focus_far">Focus Far</string>
     <string name="action_name_focus_near">Focus Near</string>
 
-    <string name="help">Help</string>
-    <string name="help_settings_connection_troubleshooting_title">Connection Troubleshooting</string>
-    <string name="help_settings_connection_troubleshooting_text">On your camera make sure that \"Bluetooth remote control\" is enabled. This is a separate setting that might get disabled if you enable other remote control methods (like IR remote).\n\nThe settings might have different names on different camera models or might be abbreviated like \"Camera Rmt Ctrl\". Please check your camera\'s manual to find all Bluetooth related settings.\n\nIf the camera does not offer pairing because it is already paired to your phone, check your phone\'s Bluetooth settings to remove an existing pairing that is not linked to this app.\n\nSometimes, the IT classic may help as well: Rebooting the phone or turning Bluetooth off and on again.</string>
+    <string name="help">接続ヘルプ</string>
+    <string name="help_settings_connection_troubleshooting_title">接続できないとき</string>
+    <string name="help_settings_connection_troubleshooting_text">カメラの「Bluetoothリモコン」がONか確認してください。「ペアリング」とは別の設定です。\n\n機種によって設定名やメニューの場所が異なります。カメラの説明書でBluetooth関連の設定を確認してください。\n\nスマホとの既存のペアリングが原因で登録できない場合は、スマホのBluetooth設定から以前のペアリングを解除し、登録し直してください。\n\nスマホの再起動や、BluetoothのOFF・ONで改善する場合もあります。</string>
     <string name="help_settings_custom_buttons_title">Custom Buttons</string>
     <string name="help_settings_custom_buttons_text">Here you can pick the buttons that you want to show up in your phone\'s notification area.\n\nNote, that these buttons only support simple taps, but cannot be held down. Therefore, you can enable a toggle function (tap to press and tap again to release) and/or a hold duration. This is especially relevant for buttons that act as \"jogs\" like zoom buttons. Here you probably want to enable a short duration along with a high speed.\n\nMost of these functions act like the buttons or jogs on your camera, but there are two exceptions:\n\n\"Focus\" is equivalent to half-pressing the shutter button. If you add it as a toggle, using any of the shutter function will automatically release the focus button, too.\n\n\"Trigger once\" will fully press the shutter button and keep it pressed until the camera reports that the shutter has been opened. In contrast to the normal shutter button, this ensures that the shutter is released even if the camera takes a moment to focus. However, the response time of the shutter status for this function is too slow to prevent taking multiple pictures if the camera is set to burst mode.\n\nYou can also bind a physical key (e.g. a volume key or a button on a Bluetooth keyboard or controller) to each button. These keys only trigger the button while this app is open in the foreground.</string>
     <string name="help_camera_remote_title">The remote</string>

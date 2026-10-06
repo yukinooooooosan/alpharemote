@@ -8,22 +8,15 @@
     <fragment android:id="@+id/navigation_selfie" android:name="org.staacks.alpharemote.ui.selfie.SelfieFragment" android:label="@string/selfie_title" tools:layout="@layout/fragment_selfie" />
 
     <fragment
-        android:id="@+id/navigation_camera"
-        android:name="org.staacks.alpharemote.ui.camera.CameraFragment"
-        android:label="@string/title_camera"
-        tools:layout="@layout/fragment_camera" >
-    </fragment>
-
-    <fragment
         android:id="@+id/navigation_about"
         android:name="org.staacks.alpharemote.ui.about.AboutFragment"
-        android:label="@string/title_about"
+        android:label="@string/selfie_about_title"
         tools:layout="@layout/fragment_about" />
 
     <fragment
         android:id="@+id/navigation_settings"
         android:name="org.staacks.alpharemote.ui.settings.SettingsFragment"
-        android:label="@string/title_settings"
+        android:label="@string/selfie_connection_title"
         tools:layout="@layout/fragment_settings" >
     </fragment>
 

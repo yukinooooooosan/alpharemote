@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="selfie_connection_title">Kameraverbindung</string>
+    <string name="selfie_about_title">App-Info</string>
+    <string name="selfie_connection_guide">Aktiviere vor der Aufnahme die Bluetooth-Fernbedienung an der Kamera.\nFür Serienaufnahmen muss die Kamera auf Serienaufnahme eingestellt sein.</string>
+</resources>

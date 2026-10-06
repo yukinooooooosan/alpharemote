@@ -38,13 +38,6 @@
             </intent-filter>
         </activity>
 
-        <receiver
-            android:name=".CameraBroadcastReceiver"
-            android:exported="true">
-            <intent-filter>
-                <action android:name="org.staacks.alpharemote.EXT_BUTTON" />
-            </intent-filter>
-        </receiver>
     </application>
 
 </manifest>

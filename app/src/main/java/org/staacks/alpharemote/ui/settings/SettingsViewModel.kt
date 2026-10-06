@@ -2,13 +2,9 @@ package org.staacks.alpharemote.ui.settings
 
 import android.app.Application
 import android.util.Log
-import android.widget.CompoundButton
-import android.widget.SeekBar
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import org.staacks.alpharemote.SettingsStore
-import org.staacks.alpharemote.camera.CameraAction
-import org.staacks.alpharemote.camera.CameraActionPreset
 import org.staacks.alpharemote.camera.CameraStateError
 import org.staacks.alpharemote.camera.CameraStateNotBonded
 import org.staacks.alpharemote.camera.CameraStateReady
@@ -60,9 +56,7 @@ class SettingsViewModel(application: Application) : AndroidViewModel(application
         UNPAIR,
         REQUEST_BLUETOOTH_PERMISSION,
         REQUEST_NOTIFICATION_PERMISSION,
-        ADD_CUSTOM_BUTTON,
-        HELP_CONNECTION,
-        HELP_CUSTOM_BUTTONS
+        HELP_CONNECTION
     }
 
     private val _uiState = MutableStateFlow(SettingsUIState(cameraState = SettingsUICameraState.OFFLINE, cameraError = null, cameraName = null, bluetoothPermissionGranted = true, notificationPermissionGranted = true, bluetoothEnabled = false, locationServiceEnabled = false, bleScanningEnabled = false))
@@ -73,41 +67,7 @@ class SettingsViewModel(application: Application) : AndroidViewModel(application
 
     private val settingsStore = SettingsStore(application)
 
-    val buttonScaleSteps = listOf(0.6f, 0.7f, 0.85f, 1.0f, 1.15f, 1.3f, 1.5f)
-    var buttonScaleIndex = MutableStateFlow(buttonScaleSteps.indexOf(1.0f))
-    var broadcastControl = MutableStateFlow(false)
-
-    val customButtonListFlow = MutableStateFlow<List<CameraAction>?>(null)
-
-    private val defaultCustomButtonList = listOf(
-        CameraAction(false, null, null, null, CameraActionPreset.TRIGGER_ONCE),
-        CameraAction(false, 3.0f, null, null, CameraActionPreset.TRIGGER_ONCE),
-        CameraAction(false, null, null, null, CameraActionPreset.RECORD),
-    )
-
     init {
-        viewModelScope.launch {
-            settingsStore.getNotificationButtonSize()?.let {
-                val i = buttonScaleSteps.indexOf(it)
-                if (i >= 0)
-                    buttonScaleIndex.value = i
-            }
-
-            var customButtonList = settingsStore.getCustomButtonList()
-            if (customButtonList == null) {
-                customButtonList = defaultCustomButtonList
-                settingsStore.saveCustomButtonList(defaultCustomButtonList)
-            }
-            customButtonListFlow.value = customButtonList
-
-            broadcastControl.value = settingsStore.getBroadcastControl()
-
-            customButtonListFlow.collect{
-                it?.let {
-                    settingsStore.saveCustomButtonList(it)
-                }
-            }
-        }
         viewModelScope.launch {
             AlphaRemoteService.serviceState.collectLatest { state ->
                 when (val camState = (state as? ServiceRunning)?.cameraState) {
@@ -210,57 +170,10 @@ class SettingsViewModel(application: Application) : AndroidViewModel(application
         }
     }
 
-    fun addCustomButton() {
-        viewModelScope.launch {
-            _uiAction.emit(SettingsUIAction.ADD_CUSTOM_BUTTON)
-        }
-    }
-
     fun helpConnection() {
         viewModelScope.launch {
             _uiAction.emit(SettingsUIAction.HELP_CONNECTION)
         }
     }
 
-    fun helpCustomButtons() {
-        viewModelScope.launch {
-            _uiAction.emit(SettingsUIAction.HELP_CUSTOM_BUTTONS)
-        }
-    }
-
-    fun setButtonScale(seekBar: SeekBar, progressValue: Int, fromUser: Boolean) {
-        if (fromUser) {
-            viewModelScope.launch {
-                buttonScaleIndex.value = progressValue
-                settingsStore.setNotificationButtonSize(buttonScaleSteps[progressValue])
-            }
-        }
-    }
-
-    fun incrementButtonScale() {
-        val newIndex = buttonScaleIndex.value + 1
-        if (newIndex < buttonScaleSteps.count()) {
-            viewModelScope.launch {
-                buttonScaleIndex.value = newIndex
-                settingsStore.setNotificationButtonSize(buttonScaleSteps[newIndex])
-            }
-        }
-    }
-
-    fun decrementButtonScale() {
-        val newIndex = buttonScaleIndex.value - 1
-        if (newIndex >= 0) {
-            viewModelScope.launch {
-                buttonScaleIndex.value = newIndex
-                settingsStore.setNotificationButtonSize(buttonScaleSteps[newIndex])
-            }
-        }
-    }
-
-    fun setBroadcastControl(button: CompoundButton, isChecked: Boolean) {
-        viewModelScope.launch {
-            broadcastControl.value = isChecked
-            settingsStore.setBroadcastControl(isChecked)
-        }
-    }
 }

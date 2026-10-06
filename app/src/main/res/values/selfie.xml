@@ -1,10 +1,13 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <color name="selfie_launcher_background">#182018</color>
     <string name="selfie_title" translatable="false">SELFIE</string>
+    <string name="selfie_connection_title">カメラ接続</string>
+    <string name="selfie_about_title">アプリ情報</string>
+    <string name="selfie_connection_guide">撮影前に、カメラ本体の「Bluetoothリモコン」をONにしてください。\n連写を使う場合は、カメラ本体を連続撮影モードに設定してください。</string>
     <string name="selfie_camera_label" translatable="false">Sony α</string>
     <string name="selfie_connected">● 接続済み</string>
     <string name="selfie_offline">○ カメラ未接続</string>
-    <string name="selfie_settings">カメラ接続・設定</string>
+    <string name="selfie_settings">カメラ接続</string>
     <string name="selfie_start" translatable="false">START</string>
     <string name="selfie_stop" translatable="false">STOP</string>
     <string name="selfie_delay">待機</string>
@@ -33,7 +36,7 @@
     <string name="selfie_disconnected">カメラとの接続が切れたため停止しました。再接続後、STARTを押してください。</string>
     <string name="selfie_done">撮影終了</string>
     <string name="selfie_stopped">停止しました</string>
-    <string name="selfie_connection_hint">設定からカメラとペアリングし、カメラ本体の「Bluetoothリモコン」を有効にしてください。</string>
+    <string name="selfie_connection_hint">「カメラ接続」からペアリングし、カメラ本体の「Bluetoothリモコン」を有効にしてください。</string>
     <string name="selfie_drive_hint">連写を使う場合はカメラ本体を連続撮影モードに。「1枚」は単写モードで使ってください。</string>
     <string name="selfie_sound_hint">AF失敗音と終了音は常に鳴ります。音量はスマホのアラーム音量で調整できます。</string>
     <string name="selfie_progress">試行 %1$d回 · 撮影操作 %2$d回 · スキップ %3$d回</string>

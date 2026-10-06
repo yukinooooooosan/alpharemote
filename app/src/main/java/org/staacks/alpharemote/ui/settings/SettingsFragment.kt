@@ -15,7 +15,6 @@ import android.content.IntentFilter
 import android.content.IntentSender
 import android.content.pm.PackageManager
 import android.location.LocationManager
-import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
@@ -34,34 +33,20 @@ import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
-import androidx.recyclerview.widget.ItemTouchHelper
-import androidx.recyclerview.widget.ItemTouchHelper.ACTION_STATE_DRAG
-import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import org.staacks.alpharemote.MainActivity
 import org.staacks.alpharemote.R
-import org.staacks.alpharemote.camera.CameraAction
 import org.staacks.alpharemote.databinding.FragmentSettingsBinding
 import org.staacks.alpharemote.service.AlphaRemoteService
 import org.staacks.alpharemote.ui.help.HelpDialogFragment
 import org.staacks.alpharemote.ui.settings.CompanionDeviceHelper.pairCompanionDevice
 import org.staacks.alpharemote.ui.settings.CompanionDeviceHelper.startObservingDevicePresence
 
-interface CustomButtonListEventReceiver {
-    fun startDragging(viewHolder: RecyclerView.ViewHolder)
-    fun itemTouched(index: Int, oldCameraAction: CameraAction)
-}
-
-class SettingsFragment : Fragment(), CustomButtonListEventReceiver, CameraActionPickerListener {
+class SettingsFragment : Fragment() {
 
     private var _binding: FragmentSettingsBinding? = null
     private val binding get() = _binding!!
-
-    lateinit var adapter: CustomButtonRecyclerViewAdapter
-
-    private var itemTouchHelper: ItemTouchHelper? = null
 
     val onDeviceFoundLauncher = registerForActivityResult(ActivityResultContracts.StartIntentSenderForResult()) { activityResult  ->
         Log.d(MainActivity.TAG, "Activity Result: $activityResult")
@@ -88,7 +73,6 @@ class SettingsFragment : Fragment(), CustomButtonListEventReceiver, CameraAction
         _binding = DataBindingUtil.inflate(inflater, R.layout.fragment_settings, container, false)
         binding.lifecycleOwner = viewLifecycleOwner
         binding.viewModel = settingsViewModel
-        binding.fragment = this
 
         viewLifecycleOwner.lifecycleScope.launch {
             settingsViewModel.uiAction.collect{ action ->
@@ -97,22 +81,14 @@ class SettingsFragment : Fragment(), CustomButtonListEventReceiver, CameraAction
                     SettingsViewModel.SettingsUIAction.UNPAIR -> unpair()
                     SettingsViewModel.SettingsUIAction.REQUEST_BLUETOOTH_PERMISSION -> requestBluetoothPermission(bluetoothRequestPermissionLauncher, true)
                     SettingsViewModel.SettingsUIAction.REQUEST_NOTIFICATION_PERMISSION -> requestNotificationPermission(true)
-                    SettingsViewModel.SettingsUIAction.ADD_CUSTOM_BUTTON -> addCustomButton()
                     SettingsViewModel.SettingsUIAction.HELP_CONNECTION ->
                         HelpDialogFragment().setContent(
                             R.string.help_settings_connection_troubleshooting_title,
                             R.string.help_settings_connection_troubleshooting_text
                         ).show(childFragmentManager, null)
-                    SettingsViewModel.SettingsUIAction.HELP_CUSTOM_BUTTONS ->
-                        HelpDialogFragment().setContent(
-                            R.string.help_settings_custom_buttons_title,
-                            R.string.help_settings_custom_buttons_text
-                        ).show(childFragmentManager, null)
                 }
             }
         }
-
-        setupCustomButtonList(settingsViewModel.customButtonListFlow)
 
         binding.linearLayout.layoutTransition.enableTransitionType(LayoutTransition.CHANGING)
 
@@ -238,8 +214,8 @@ class SettingsFragment : Fragment(), CustomButtonListEventReceiver, CameraAction
         if (!skipRationale && shouldShowRequestPermissionRationale(Manifest.permission.BLUETOOTH_CONNECT)) {
             MaterialAlertDialogBuilder(requireContext())
                 .setMessage(R.string.permission_bluetooth_rationale)
-                .setPositiveButton("OK") { _, _ -> launcher.launch(Manifest.permission.BLUETOOTH_CONNECT) }
-                .setNegativeButton("Cancel", null)
+                .setPositiveButton(android.R.string.ok) { _, _ -> launcher.launch(Manifest.permission.BLUETOOTH_CONNECT) }
+                .setNegativeButton(android.R.string.cancel, null)
                 .create()
                 .show()
         } else
@@ -254,10 +230,10 @@ class SettingsFragment : Fragment(), CustomButtonListEventReceiver, CameraAction
         else {
             MaterialAlertDialogBuilder(requireContext())
                 .setMessage(R.string.permission_notification_rationale)
-                .setPositiveButton("OK") { _, _ ->
+                .setPositiveButton(android.R.string.ok) { _, _ ->
                     notificationsRequestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
                 }
-                .setNegativeButton("Cancel", null)
+                .setNegativeButton(android.R.string.cancel, null)
                 .create()
                 .show()
         }
@@ -319,75 +295,4 @@ class SettingsFragment : Fragment(), CustomButtonListEventReceiver, CameraAction
         binding.viewModel?.updateLocationServiceState(locationManager.isLocationEnabled, bleScanning)
     }
 
-    private fun setupCustomButtonList(customButtonListFlow: MutableStateFlow<List<CameraAction>?>) {
-        val customButtonsList = binding.customButtonsList
-
-        adapter = CustomButtonRecyclerViewAdapter(customButtonListFlow, this, this)
-        customButtonsList.adapter = adapter
-
-        val callback = object : ItemTouchHelper.SimpleCallback(
-            ItemTouchHelper.UP or ItemTouchHelper.DOWN or ItemTouchHelper.START or ItemTouchHelper.END,
-            ItemTouchHelper.START or ItemTouchHelper.END
-        ) {
-            override fun onMove(
-                recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder, target: RecyclerView.ViewHolder
-            ): Boolean {
-                val from = viewHolder.adapterPosition
-                val to = target.adapterPosition
-                adapter.moveItem(from, to)
-                return true
-            }
-
-            override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
-                adapter.removeItem(viewHolder.adapterPosition)
-            }
-
-            override fun onSelectedChanged(viewHolder: RecyclerView.ViewHolder?, actionState: Int) {
-                super.onSelectedChanged(viewHolder, actionState)
-                if (actionState == ACTION_STATE_DRAG) {
-                    viewHolder?.itemView?.alpha = 0.5f
-                }
-            }
-
-            override fun clearView(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder) {
-                super.clearView(recyclerView, viewHolder)
-                viewHolder.itemView.alpha = 1.0f
-            }
-        }
-
-        itemTouchHelper = ItemTouchHelper(callback).apply {
-            attachToRecyclerView(customButtonsList)
-        }
-    }
-
-    override fun startDragging(viewHolder: RecyclerView.ViewHolder) {
-        itemTouchHelper?.startDrag(viewHolder)
-    }
-
-    override fun itemTouched(index: Int, oldCameraAction: CameraAction) {
-        val cameraActionPicker = CameraActionPicker.newInstance(index, oldCameraAction, showDelete = true)
-        cameraActionPicker.show(childFragmentManager, null)
-    }
-
-    private fun addCustomButton() {
-        val cameraActionPicker = CameraActionPicker()
-        cameraActionPicker.show(childFragmentManager, null)
-    }
-
-    override fun onConfirmCameraActionPicker(index: Int, cameraAction: CameraAction) {
-        adapter.updateItem(index, cameraAction)
-    }
-
-    override fun onCancelCameraActionPicker() {
-    }
-
-    override fun onDeleteCameraActionPicker(index: Int) {
-        adapter.removeItem(index)
-    }
-
-    fun openURL(target: String) {
-        val uri = Uri.parse(target)
-        val intent = Intent(Intent.ACTION_VIEW, uri)
-        startActivity(intent)
-    }
 }
