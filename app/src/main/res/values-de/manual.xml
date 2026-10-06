@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="manual_title">Anleitung</string>
+    <string name="manual_intro">Drücke START, lege das Handy außer Sicht und gehe zur Aufnahmeposition. Die Kamera fokussiert erst nach dem Countdown und wiederholt dann die Aufnahme.</string>
+    <string name="manual_prepare_title">1. Vorbereiten</string>
+    <string name="manual_prepare_body">Aktiviere die Bluetooth-Fernbedienung an der Kamera. Kopple sie beim ersten Mal unter „Kameraverbindung“ und erlaube Bluetooth und Benachrichtigungen auf dem Handy.\n\nStelle AF-Modus und AF-Bereich an der Kamera ein. Verwende für „Einzelbild“ den Einzelbildmodus, für 0,5 / 1 / 2 Sekunden den Serienbildmodus. Die App ändert den Bildfolgemodus der Kamera nicht.</string>
+    <string name="manual_start_title">2. Von START zur Aufnahme</string>
+    <string name="manual_start_body">Wähle auf SELFIE Wartezeit, Aufnahmedauer und Anzahl. Drücke START, sobald die Kamera verbunden ist. Die Einstellungen werden für das nächste Mal gespeichert.\n\nLege das Handy außer Sicht und gehe während des Countdowns zur Aufnahmeposition. Die Aufnahme läuft auch bei ausgeschaltetem Bildschirm weiter.\n\nCountdown endet → AF → Aufnahme nach bestätigtem Fokus → nächster Countdown. Dies wiederholt sich bis zur eingestellten Anzahl.</string>
+    <string name="manual_settings_title">3. Wartezeit, Aufnahme und Anzahl</string>
+    <string name="manual_settings_body">Wartezeit: 3 / 5 / 10 Sekunden (Standard: 5). Der Countdown beginnt nach START und vor jeder Aufnahme.\n\nAufnahme: Einzelbild / 0,5 / 1 / 2 Sekunden (Standard: 1). Einzelbild bedeutet einen kurzen Auslöserdruck. Im Serienbildmodus können dabei mehrere Bilder entstehen.\n\nAnzahl: 1 / 5 / 10 / ∞ (Standard: 5). Bei ∞ läuft die Folge bis STOP weiter.</string>
+    <string name="manual_focus_title">4. Wenn der AF fehlschlägt</string>
+    <string name="manual_focus_body">Der AF beginnt erst nach dem Countdown. Wird innerhalb von 3 Sekunden kein Fokus bestätigt, wird der Auslöser freigegeben, ein Fehlerton abgespielt und dieser Versuch übersprungen.\n\nEin AF-Fehler zählt als Versuch. Bei 5 Versuchen und 2 Fehlern erfolgen 3 Auslösungen. Die angezeigten Auslösungen sind nicht die Anzahl der gespeicherten Bilder.</string>
+    <string name="manual_sound_title">5. Töne</string>
+    <string name="manual_sound_body">Der Countdown spielt jede Sekunde einen kurzen Ton, in der letzten Sekunde einen Doppelton. Bei AF-Fehlern ertönt ein Fehlerton, am Ende aller Versuche ein Abschlusston.\n\nAuch bei ausgeschaltetem Countdown-Ton bleiben Fehler- und Abschlusston aktiv. Stelle die Lautstärke über die Weckerlautstärke des Handys ein.</string>
+    <string name="manual_stop_title">6. STOP, Bildschirm aus und Verbindung</string>
+    <string name="manual_stop_body">Beende die Folge mit STOP auf dem Bildschirm oder in der geöffneten Benachrichtigung. STOP funktioniert während Countdown, AF und Aufnahme.\n\nDie Folge läuft bei bestehender Verbindung auch im Hintergrund und mit ausgeschaltetem Bildschirm weiter.\n\nWird die Kamera ausgeschaltet oder Bluetooth getrennt, stoppt die Folge. Eine erneute Verbindung startet keine Aufnahme. Drücke zum Fortsetzen erneut START.</string>
+    <string name="manual_trouble_title">Bei Problemen</string>
+    <string name="manual_trouble_body">Keine Verbindung: Prüfe Kamera-Stromversorgung, Bluetooth am Handy und Bluetooth-Fernbedienung an der Kamera. Nutze auch die Verbindungshilfe unter „Kameraverbindung“.\n\nWiederholte AF-Fehler: Prüfe AF-Modus, AF-Bereich und ob das Motiv fokussiert werden kann.\n\nKein Ton: Prüfe die Weckerlautstärke und die Ton- und Benachrichtigungseinstellungen des Handys.</string>
+    <string name="selfie_about_credit_title">Mitwirkende</string>
+    <string name="selfie_about_credit">Original: α-Remote © Sebastian Staacks\nSelfie-Funktionen und geänderte Oberfläche: yukinooooooosan\nÄnderungsdatum: 6. Oktober 2026</string>
+    <string name="selfie_about_license">Veröffentlicht unter GPL-3.0. Weitergabe und Änderungen sind unter den Bedingungen dieser Lizenz erlaubt.\nDiese App wird ohne Gewährleistung bereitgestellt. Einzelheiten stehen im vollständigen GPL-3.0-Lizenztext.</string>
+    <string name="selfie_about_license_button">Vollständige GPL-3.0-Lizenz</string>
+    <string name="selfie_about_upstream">Originalprojekt α-Remote</string>
+</resources>

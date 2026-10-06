@@ -41,6 +41,11 @@ class AboutFragment : Fragment() {
         return root
     }
 
+    fun showLicense() {
+        if (childFragmentManager.findFragmentByTag("license") == null)
+            LicenseDialogFragment().show(childFragmentManager, "license")
+    }
+
     fun openURL(target: String) {
         val uri = Uri.parse(target)
         val intent = Intent(Intent.ACTION_VIEW, uri)

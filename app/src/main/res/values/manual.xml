@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="manual_title">取説</string>
+    <string name="manual_intro">STARTを押したらスマホを隠して、撮影位置へ。カウントダウンが終わってからピントを合わせ、撮影を繰り返します。</string>
+    <string name="manual_prepare_title">1. 撮影前の準備</string>
+    <string name="manual_prepare_body">カメラ本体の「Bluetoothリモコン」をONにします。初回は「カメラ接続」画面からペアリングし、スマホのBluetoothと通知の権限を許可してください。\n\nカメラ本体でAFモードとAFエリアを設定します。「1枚」は単写モード、0.5／1／2秒の連写は連続撮影モードで使ってください。アプリからカメラのドライブモードは変更しません。</string>
+    <string name="manual_start_title">2. STARTから撮影まで</string>
+    <string name="manual_start_body">SELFIE画面で待機・撮影・回数を選び、接続済みになったらSTARTを押します。設定は次回も引き継がれます。\n\nスマホを隠して、カウントダウン中に撮影位置へ移動してください。画面をOFFにしても撮影は続きます。\n\nカウントダウン終了 → AF → 合焦したら撮影 → 次のカウントダウン。設定回数が終わるまで繰り返します。</string>
+    <string name="manual_settings_title">3. 待機・撮影・回数</string>
+    <string name="manual_settings_body">待機：3／5／10秒（初期値5秒）。START直後と、毎回の撮影前に待ちます。\n\n撮影：1枚／0.5／1／2秒（初期値1秒）。「1枚」はシャッターを短く押します。カメラが連写モードの場合、複数枚になることがあります。\n\n回数：1／5／10／∞（初期値5回）。∞はSTOPするまで繰り返します。</string>
+    <string name="manual_focus_title">4. AFに失敗したとき</string>
+    <string name="manual_focus_body">AFはカウントダウンの後に開始します。3秒以内に合焦を確認できない場合はシャッターを解除し、エラー音を鳴らして、その回をスキップします。\n\nAF失敗も1回に数えます。例えば5回設定で2回失敗すると、撮影操作は3回です。画面の「撮影操作」はカメラに保存された画像の枚数ではありません。</string>
+    <string name="manual_sound_title">5. 音の案内</string>
+    <string name="manual_sound_body">カウントダウンは1秒ごとに短音、最後の1秒は二連音です。AF失敗時にはエラー音、すべての回が終わったら終了音が鳴ります。\n\n「カウントダウン音」をOFFにしても、AF失敗音と終了音は鳴ります。音量はスマホのアラーム音量で調整してください。</string>
+    <string name="manual_stop_title">6. STOP・画面OFF・切断</string>
+    <string name="manual_stop_body">撮影中は画面のSTOP、または通知を開いてSTOPを押すと終了します。カウントダウン・AF・撮影のどの段階でも止められます。\n\nアプリをバックグラウンドに移動したり、画面をOFFにしたりしても、接続中は撮影を続けます。\n\nカメラの電源OFFやBluetooth切断では撮影を停止します。再接続だけでは撮影を再開しません。再開するときはSTARTを押してください。</string>
+    <string name="manual_trouble_title">困ったとき</string>
+    <string name="manual_trouble_body">接続できない：カメラの電源、スマホのBluetooth、カメラの「Bluetoothリモコン」を確認してください。「カメラ接続」の接続ヘルプも使えます。\n\nAF失敗が続く：カメラ本体のAFモードとAFエリア、被写体にピントが合う状況かを確認してください。\n\n音が聞こえない：スマホのアラーム音量と端末側の音・通知の制限を確認してください。</string>
+    <string name="selfie_about_credit_title">クレジット</string>
+    <string name="selfie_about_credit">原作：α-Remote © Sebastian Staacks\n自撮り機能追加・画面改変：yukinooooooosan\n改変日：2026年10月6日</string>
+    <string name="selfie_about_license">GPL-3.0で公開されています。このライセンスに従って再配布・改変できます。\nこのアプリは無保証です。詳しい条件はGPL-3.0本文を確認してください。</string>
+    <string name="selfie_about_license_button">GPL-3.0 ライセンス全文</string>
+    <string name="selfie_about_upstream">元プロジェクト α-Remote</string>
+</resources>

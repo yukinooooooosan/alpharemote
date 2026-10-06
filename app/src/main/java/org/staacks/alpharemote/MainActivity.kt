@@ -48,7 +48,7 @@ class MainActivity : AppCompatActivity() {
 
     fun navigateTo(id: Int) {
         binding.navView.selectedItemId = when (id) {
-            R.id.navigation_selfie, R.id.navigation_settings, R.id.navigation_about -> id
+            R.id.navigation_selfie, R.id.navigation_settings, R.id.navigation_manual, R.id.navigation_about -> id
             else -> R.id.navigation_selfie
         }
     }

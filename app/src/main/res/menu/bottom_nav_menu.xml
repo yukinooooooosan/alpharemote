@@ -8,6 +8,8 @@
         android:icon="@drawable/ic_settings_black_24dp"
         android:title="@string/selfie_connection_title" />
 
+    <item android:id="@+id/navigation_manual" android:icon="@drawable/baseline_text_snippet_24" android:title="@string/manual_title" />
+
     <item
         android:id="@+id/navigation_about"
         android:icon="@drawable/ic_about_black_24dp"

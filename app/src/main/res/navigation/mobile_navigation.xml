@@ -7,6 +7,8 @@
 
     <fragment android:id="@+id/navigation_selfie" android:name="org.staacks.alpharemote.ui.selfie.SelfieFragment" android:label="@string/selfie_title" tools:layout="@layout/fragment_selfie" />
 
+    <fragment android:id="@+id/navigation_manual" android:name="org.staacks.alpharemote.ui.manual.ManualFragment" android:label="@string/manual_title" tools:layout="@layout/fragment_manual" />
+
     <fragment
         android:id="@+id/navigation_about"
         android:name="org.staacks.alpharemote.ui.about.AboutFragment"
