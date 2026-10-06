@@ -59,7 +59,7 @@ Android StudioまたはJava 21 / Android SDK 37.0を使う。
 APKのJava互換性は17のまま。Android 16相当のRobolectric起動テストにはJava 21が必要。Android 12（API 31）以上が必要。
 SDK Managerではパッケージ名 `platforms;android-37.0` を選ぶ。
 `local.properties` に `sdk.dir` を設定するか `ANDROID_HOME` を設定する。
-MacのAndroid StudioでCompose Previewを調整し、実機配布APKのビルドと署名は既存の鍵があるN100で行う。[環境準備・プレビュー・Git同期・N100でのビルド手順](MAC-N100-WORKFLOW.md)を参照。
+MacのAndroid StudioでCompose Previewを調整し、実機配布APKのビルドと署名は既存の鍵があるN100で行う。端末固有のセットアップ手順はGit管理対象外のローカルファイルに保存する。
 
 ```sh
 ./gradlew testDebugUnitTest assembleDebug lintDebug

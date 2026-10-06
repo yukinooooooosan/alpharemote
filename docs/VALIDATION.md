@@ -85,7 +85,7 @@ versionCodeは4、versionNameは0.1.3。
 SELFIEをComposeView内のCompose / Material 3画面に置き換えた。カメラ接続・取説・アプリ情報と下部ナビゲーションは既存XMLのまま。
 Fragmentがライフサイクルに合わせてService / ViewModelの状態を収集し、表示とイベントだけを扱う`SelfieScreen`へ渡す。
 `SelfiePreview`は7状態のサンプルと空のイベント処理を使い、通常・ダークの14通りを生成する。カメラ操作・Service起動・設定保存・タイマー処理はプレビューから呼ばない。
-Macでプレビュー調整、N100でテスト・APKビルド・署名を行う[手順書](MAC-N100-WORKFLOW.md)を追加した。versionCodeは5、versionNameは0.1.4。
+Macでプレビュー調整、N100でテスト・APKビルド・署名を行う手順書を追加した（その後、端末固有の手順書はローカルに保持し、Git管理対象から除外した）。versionCodeは5、versionNameは0.1.4。
 
 - `testDebugUnitTest assembleDebug lintDebug --no-daemon`：成功。
 - 全40件成功、失敗・エラー・スキップ0件。既存24件にCompose画面12件とFragmentの接続案内／ナビゲーション4件を追加。

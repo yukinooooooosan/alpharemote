@@ -5,7 +5,7 @@ Sony α向け自撮り専用Bluetoothリモコン。α-Remoteの改変版（GPL-
 START → カウントダウン → 撮影直前AF → 合焦後に撮影 → 自動繰り返し。
 
 [仕様・使い方・ビルド・実機テスト](docs/SELFIE-MVP.md)を参照してください。
-SELFIE画面はCompose、ほかの3画面はXMLです。[MacのUIプレビュー・N100のテスト／署名付きAPKビルド手順](docs/MAC-N100-WORKFLOW.md)をまとめています。
+SELFIE画面はCompose、ほかの3画面はXMLです。MacでUIをプレビューし、実機配布APKのビルド・署名はN100で行います。
 現在は実機検証中の開発版です。`feature/selfie-mode` ブランチで開発しています。
 Pixel 10 Proで5秒待機・5枚撮影は確認済みです。網羅的な実機確認はまだ完了していません。
 
