@@ -1,4 +1,4 @@
-# Selfie Remote v0.1
+# Selfie Remote v0.1.1
 
 Sony αのBluetoothリモコン機能を使う、自撮り用Androidアプリ。
 Sebastian Staacksの[α-Remote](https://github.com/Staacks/alpharemote)をベースにしたGPL-3.0の改変版です。Sony公式アプリではありません。
@@ -49,7 +49,8 @@ AFタイムアウトはシャッターを解除して、エラー音を鳴らし
 
 ## ビルド
 
-Android StudioまたはJava 17 / Android SDK 37.0を使う。Android 12（API 31）以上が必要。
+Android StudioまたはJava 21 / Android SDK 37.0を使う。
+APKのJava互換性は17のまま。Android 16相当のRobolectric起動テストにはJava 21が必要。Android 12（API 31）以上が必要。
 SDK Managerではパッケージ名 `platforms;android-37.0` を選ぶ。
 `local.properties` に `sdk.dir` を設定するか `ANDROID_HOME` を設定する。
 

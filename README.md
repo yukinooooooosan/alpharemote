@@ -5,7 +5,7 @@ Sony α向け自撮り専用Bluetoothリモコン。α-Remoteの改変版（GPL-
 START → カウントダウン → 撮影直前AF → 合焦後に撮影 → 自動繰り返し。
 
 [仕様・使い方・ビルド・実機テスト](docs/SELFIE-MVP.md)を参照してください。
-現在は実機検証前の開発版です。`feature/selfie-mode` ブランチで開発しています。
+現在は実機検証中の開発版です。`feature/selfie-mode` ブランチで開発しています。
 
 元作者Sebastian Staacksの著作権表示とGPL-3.0 LICENSEを維持しています。
 上流: [Staacks/alpharemote](https://github.com/Staacks/alpharemote)。Sony公式アプリではありません。

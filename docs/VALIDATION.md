@@ -2,7 +2,7 @@
 
 2026-10-06、実機確認は後回しとする方針で検証した。
 
-## 自動検証
+## 0.1.0の自動検証
 
 - 上流 `Staacks/alpharemote` の `4a950a8` を別のworktreeで `testDebugUnitTest assembleDebug`：成功。
 - 自撮りモード追加後の `testDebugUnitTest assembleDebug lintDebug`：成功。
@@ -29,3 +29,19 @@
 Android端末とSonyカメラを使うBLE操作、実際の画像枚数、AFの挙動、音の聞こえ方、画面OFFでの継続、ロック画面通知の操作は未検証。
 [実機チェックリスト](SELFIE-MVP.md#実機で確認する項目)を使って後日確認する。
 この版はインストール可能なデバッグビルドで、MVPの実写完成条件を確認した版ではない。
+
+
+## 0.1.1：起動クラッシュの修正
+
+Pixel 10 Proで起動直後に閉じるとの報告を受け、Android画面の起動テストを追加した。
+0.1.0のSELFIE画面で、カウントダウン音スイッチの初回計測中に `SwitchCompat.makeLayout` → `StaticLayout` へnullのラベルが渡り、NullPointerExceptionになることをRobolectric（API 31）で再現した。
+
+既存のMaterial Componentsテーマに合わせて、Material 3の `MaterialSwitch` を `SwitchMaterial` に置き換え、`showText=false` を明示した。
+versionCodeを2、versionNameを0.1.1に更新。同じデバッグ署名を維持しているため、0.1.0へ上書きインストールできる。
+
+- `testDebugUnitTest assembleDebug lintDebug`：成功。
+- 全14件成功、失敗0件。うち起動テストはAPI 31 / 36の各々で通常・ダークテーマの4件。
+- Android 12 / 16相当で、Activityの起動・初回の画面計測・SELFIE画面の表示を検証した。
+- APK署名検証：成功。0.1.0と証明書のSHA-256が一致。
+- ビルドとテストの実行環境はJava 21。アプリのJavaターゲットは17を維持。
+- RobolectricはJVM上でAndroid画面を実行するテスト。Pixel 10 Proでの修正版の起動と、Sonyカメラを使った撮影は別途確認する。
