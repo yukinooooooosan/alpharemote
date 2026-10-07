@@ -1,6 +1,7 @@
 package org.staacks.alpharemote.ui
 
 import android.graphics.Bitmap
+import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.graphics.asAndroidBitmap
 import androidx.compose.ui.test.captureToImage
@@ -37,11 +38,14 @@ class ComposeRenderTest {
         val sample = mutableStateOf(SelfiePreviewSamples.samples[1].state)
         compose.setContent {
             SelfieTheme(dark.value) {
-                when (page.value) {
-                    "manual" -> ManualScreen()
-                    "about" -> AboutScreen("0.1.5", 6, {}, {})
-                    "connection" -> ConnectionScreen(ConnectionPreviewSamples.ready, {})
-                    else -> SelfieScreen(sample.value, {})
+                // Each capture starts at the top, as in a fresh IDE preview.
+                key(page.value, dark.value) {
+                    when (page.value) {
+                        "manual" -> ManualScreen()
+                        "about" -> AboutScreen("0.1.5", 6, {}, {})
+                        "connection" -> ConnectionScreen(ConnectionPreviewSamples.ready, {})
+                        else -> SelfieScreen(sample.value, {})
+                    }
                 }
             }
         }
