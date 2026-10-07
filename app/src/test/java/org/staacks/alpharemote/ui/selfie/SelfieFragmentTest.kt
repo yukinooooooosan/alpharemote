@@ -1,6 +1,7 @@
 package org.staacks.alpharemote.ui.selfie
 
 import android.widget.TextView
+import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.test.assertIsEnabled
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithTag
@@ -41,12 +42,12 @@ class SelfieFragmentTest {
         }
     }
 
-    @Test fun connectionButtonNavigatesToExistingXmlScreen() {
+    @Test fun connectionButtonNavigatesToComposeScreen() {
         compose.onNodeWithTag("camera_settings").performClick()
         compose.runOnIdle {
             assertEquals(R.id.navigation_settings,
                 compose.activity.findNavController(R.id.nav_host_fragment_activity_main).currentDestination?.id)
-            assertNotNull(compose.activity.findViewById<TextView>(R.id.connection_title))
+            assertNotNull(compose.activity.findViewById<ComposeView>(R.id.connection_compose_view))
         }
     }
 }

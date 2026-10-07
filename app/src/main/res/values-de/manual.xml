@@ -17,7 +17,7 @@
     <string name="manual_trouble_title">Bei Problemen</string>
     <string name="manual_trouble_body">Keine Verbindung: Prüfe Kamera-Stromversorgung, Bluetooth am Handy und Bluetooth-Fernbedienung an der Kamera. Nutze auch die Verbindungshilfe unter „Kameraverbindung“.\n\nWiederholte AF-Fehler: Prüfe AF-Modus, AF-Bereich und ob das Motiv fokussiert werden kann.\n\nKein Ton: Prüfe die Weckerlautstärke und die Ton- und Benachrichtigungseinstellungen des Handys.</string>
     <string name="selfie_about_credit_title">Mitwirkende</string>
-    <string name="selfie_about_credit">Original: α-Remote © Sebastian Staacks\nSelfie-Funktionen und geänderte Oberfläche: yukinooooooosan\nÄnderungsdatum: 6. Oktober 2026</string>
+    <string name="selfie_about_credit">Original: α-Remote © Sebastian Staacks\nSelfie-Funktionen und geänderte Oberfläche: yukinooooooosan\nÄnderungsdatum: 7. Oktober 2026</string>
     <string name="selfie_about_license">Veröffentlicht unter GPL-3.0. Weitergabe und Änderungen sind unter den Bedingungen dieser Lizenz erlaubt.\nDiese App wird ohne Gewährleistung bereitgestellt. Einzelheiten stehen im vollständigen GPL-3.0-Lizenztext.</string>
     <string name="selfie_about_license_button">Vollständige GPL-3.0-Lizenz</string>
     <string name="selfie_about_upstream">Originalprojekt α-Remote</string>

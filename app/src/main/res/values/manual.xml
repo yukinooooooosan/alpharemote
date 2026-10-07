@@ -17,7 +17,7 @@
     <string name="manual_trouble_title">困ったとき</string>
     <string name="manual_trouble_body">接続できない：カメラの電源、スマホのBluetooth、カメラの「Bluetoothリモコン」を確認してください。「カメラ接続」の接続ヘルプも使えます。\n\nAF失敗が続く：カメラ本体のAFモードとAFエリア、被写体にピントが合う状況かを確認してください。\n\n音が聞こえない：スマホのアラーム音量と端末側の音・通知の制限を確認してください。</string>
     <string name="selfie_about_credit_title">クレジット</string>
-    <string name="selfie_about_credit">原作：α-Remote © Sebastian Staacks\n自撮り機能追加・画面改変：yukinooooooosan\n改変日：2026年10月6日</string>
+    <string name="selfie_about_credit">原作：α-Remote © Sebastian Staacks\n自撮り機能追加・画面改変：yukinooooooosan\n改変日：2026年10月7日</string>
     <string name="selfie_about_license">GPL-3.0で公開されています。このライセンスに従って再配布・改変できます。\nこのアプリは無保証です。詳しい条件はGPL-3.0本文を確認してください。</string>
     <string name="selfie_about_license_button">GPL-3.0 ライセンス全文</string>
     <string name="selfie_about_upstream">元プロジェクト α-Remote</string>

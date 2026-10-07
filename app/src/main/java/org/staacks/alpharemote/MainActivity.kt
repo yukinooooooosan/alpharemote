@@ -5,13 +5,22 @@ import android.os.Bundle
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.findNavController
-import androidx.navigation.ui.setupWithNavController
-import com.google.android.material.bottomnavigation.BottomNavigationView
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.ui.platform.ViewCompositionStrategy
+import androidx.navigation.NavController
+import androidx.navigation.NavGraph.Companion.findStartDestination
+import androidx.navigation.navOptions
+import org.staacks.alpharemote.ui.components.SelfieNavigationBar
+import org.staacks.alpharemote.ui.selfie.SelfieTheme
 import org.staacks.alpharemote.databinding.ActivityMainBinding
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
+    private val selectedPage = mutableIntStateOf(R.id.navigation_selfie)
+    private val destinationListener = NavController.OnDestinationChangedListener { _, destination, _ ->
+        selectedPage.intValue = destination.id
+    }
 
     companion object {
         const val NAVIGATE_TO_INTENT_EXTRA = "nav_to"
@@ -27,11 +36,12 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        val navView: BottomNavigationView = binding.navView
-
         val navController = findNavController(R.id.nav_host_fragment_activity_main)
-
-        navView.setupWithNavController(navController)
+        navController.addOnDestinationChangedListener(destinationListener)
+        binding.navView.setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+        binding.navView.setContent {
+            SelfieTheme { SelfieNavigationBar(selectedPage.intValue, ::navigateTo) }
+        }
 
         var startPage = intent?.getIntExtra(NAVIGATE_TO_INTENT_EXTRA, R.id.navigation_selfie) ?: R.id.navigation_selfie
         startPage = savedInstanceState?.getInt(SELECTED_PAGE, startPage) ?: startPage
@@ -47,15 +57,28 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun navigateTo(id: Int) {
-        binding.navView.selectedItemId = when (id) {
+        val target = when (id) {
             R.id.navigation_selfie, R.id.navigation_settings, R.id.navigation_manual, R.id.navigation_about -> id
             else -> R.id.navigation_selfie
         }
+        val nav = findNavController(R.id.nav_host_fragment_activity_main)
+        if (nav.currentDestination?.id != target) {
+            nav.navigate(target, null, navOptions {
+                launchSingleTop = true
+                restoreState = true
+                popUpTo(nav.graph.findStartDestination().id) { saveState = true }
+            })
+        }
+    }
+
+    override fun onDestroy() {
+        findNavController(R.id.nav_host_fragment_activity_main).removeOnDestinationChangedListener(destinationListener)
+        super.onDestroy()
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
-        outState.putInt(SELECTED_PAGE, binding.navView.selectedItemId)
+        outState.putInt(SELECTED_PAGE, selectedPage.intValue)
     }
 
 }

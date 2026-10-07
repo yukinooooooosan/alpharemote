@@ -1,14 +1,12 @@
 package org.staacks.alpharemote
 
 import android.widget.TextView
-import android.widget.Button
 import android.app.Dialog
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Looper
 import androidx.compose.ui.platform.ComposeView
 import androidx.navigation.findNavController
-import com.google.android.material.bottomnavigation.BottomNavigationView
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Assert.assertNotNull
@@ -19,6 +17,8 @@ import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
 import org.robolectric.Shadows.shadowOf
 import org.robolectric.shadows.ShadowDialog
+import androidx.navigation.fragment.NavHostFragment
+import org.staacks.alpharemote.ui.about.AboutFragment
 
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [31, 36])
@@ -36,17 +36,15 @@ class StartupTest {
     @Test fun fourTabsOpenWithConnectionScreen() {
         Robolectric.buildActivity(MainActivity::class.java).use { controller ->
             val activity = controller.setup().get()
-            val nav = activity.findViewById<BottomNavigationView>(R.id.nav_view)
-            assertEquals(listOf(R.id.navigation_selfie, R.id.navigation_settings, R.id.navigation_manual, R.id.navigation_about),
-                (0 until nav.menu.size()).map { nav.menu.getItem(it).itemId })
+            assertNotNull(activity.findViewById<ComposeView>(R.id.nav_view))
             activity.navigateTo(R.id.navigation_settings)
             shadowOf(Looper.getMainLooper()).idle()
-            assertNotNull(activity.findViewById<TextView>(R.id.connection_title))
+            assertNotNull(activity.findViewById<ComposeView>(R.id.connection_compose_view))
             assertEquals(R.id.navigation_settings,
                 activity.findNavController(R.id.nav_host_fragment_activity_main).currentDestination?.id)
             activity.navigateTo(R.id.navigation_manual)
             shadowOf(Looper.getMainLooper()).idle()
-            assertNotNull(activity.findViewById<TextView>(R.id.manual_title))
+            assertNotNull(activity.findViewById<ComposeView>(R.id.manual_compose_view))
             assertEquals(R.id.navigation_manual,
                 activity.findNavController(R.id.nav_host_fragment_activity_main).currentDestination?.id)
             activity.navigateTo(R.id.navigation_about)
@@ -70,7 +68,7 @@ class StartupTest {
             val activity = controller.setup().get()
             activity.navigateTo(R.id.navigation_manual)
             shadowOf(Looper.getMainLooper()).idle()
-            assertNotNull(activity.findViewById<TextView>(R.id.manual_title))
+            assertNotNull(activity.findViewById<ComposeView>(R.id.manual_compose_view))
             activity.navigateTo(R.id.navigation_about)
             shadowOf(Looper.getMainLooper()).idle()
             checkLicenseDialog(activity)
@@ -78,7 +76,8 @@ class StartupTest {
     }
 
     private fun checkLicenseDialog(activity: MainActivity) {
-        activity.findViewById<Button>(R.id.about_license_button).performClick()
+        val host = activity.supportFragmentManager.findFragmentById(R.id.nav_host_fragment_activity_main) as NavHostFragment
+        (host.childFragmentManager.primaryNavigationFragment as AboutFragment).showLicense()
         shadowOf(Looper.getMainLooper()).idle()
         val dialog: Dialog = ShadowDialog.getLatestDialog()
         val text = dialog.findViewById<TextView>(R.id.license_text).text.toString()

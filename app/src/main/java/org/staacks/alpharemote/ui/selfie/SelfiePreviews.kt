@@ -7,6 +7,7 @@ import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import org.staacks.alpharemote.selfie.SelfiePhase
 import org.staacks.alpharemote.selfie.SelfieState
+import org.staacks.alpharemote.selfie.SelfieSettings
 
 /** Immutable fixtures shared by IDE previews and headless rendering tests. */
 object SelfiePreviewSamples {
@@ -24,6 +25,15 @@ object SelfiePreviewSamples {
             session = SelfieState(phase = SelfiePhase.ERROR, attempts = 1, shots = 1))),
         Sample("撮影終了", SelfieUiState(connected = true,
             session = SelfieState(phase = SelfiePhase.COMPLETED, attempts = 5, shots = 5))),
+        Sample("停止", SelfieUiState(connected = true,
+            session = SelfieState(phase = SelfiePhase.STOPPED, attempts = 2, shots = 1, skipped = 1))),
+        Sample("切断で停止", SelfieUiState(session = SelfieState(phase = SelfiePhase.ERROR, disconnected = true,
+            attempts = 2, shots = 2))),
+        Sample("設定の復元待ち", SelfieUiState(settingsLoaded = false)),
+        Sample("無限撮影", SelfieUiState(connected = true, settings = SelfieSettings(cycles = 0),
+            session = SelfieState(phase = SelfiePhase.COUNTDOWN, remainingSeconds = 5, attempts = 8, shots = 7, skipped = 1, targetCycles = 0))),
+        Sample("スキップありで終了", SelfieUiState(connected = true,
+            session = SelfieState(phase = SelfiePhase.COMPLETED, attempts = 5, shots = 3, skipped = 2))),
     )
 }
 
@@ -43,4 +53,11 @@ fun SelfiePreview(@PreviewParameter(SelfiePreviewProvider::class) state: SelfieU
         // Clicking START/STOP or a setting in interactive preview is a no-op.
         SelfieScreen(state = state, onAction = {})
     }
+}
+
+@Preview(name = "小画面・大きな文字・撮影中", group = "SELFIE", widthDp = 320, heightDp = 480,
+    fontScale = 1.5f, apiLevel = 36, locale = "ja")
+@Composable
+fun SelfieAccessiblePreview() {
+    SelfiePreview(SelfiePreviewSamples.samples[3].state)
 }

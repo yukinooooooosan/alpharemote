@@ -1,4 +1,4 @@
-# Selfie Remote v0.1.4
+# Selfie Remote v0.1.5
 
 Sony αのBluetoothリモコン機能を使う、自撮り用Androidアプリ。
 Sebastian Staacksの[α-Remote](https://github.com/Staacks/alpharemote)をベースにしたGPL-3.0の改変版です。Sony公式アプリではありません。
@@ -33,10 +33,10 @@ AFタイムアウトはシャッターを解除して、エラー音を鳴らし
 
 ## 実装
 
-- 起動時のSELFIE画面をJetpack Composeに移行した。カメラ接続・取説・アプリ情報はXML / Material Components / ViewBindingを維持する。
-- UIは表示用状態とイベントだけを扱い、Fragmentが既存Service / ViewModelへ接続する。7つのサンプル状態×通常・ダークの`@Preview`はカメラ操作・Service起動・設定保存を行わない。
+- SELFIE・カメラ接続・取説・アプリ情報と下部タブをCompose / Material 3に統一した。既存Fragmentナビゲーションと権限・ペアリング処理は維持する。
+- UIは表示用状態とイベントだけを扱い、Fragmentが既存Service / ViewModelへ接続する。SELFIEの12状態、接続の8状態、取説・アプリ情報の通常／ダーク`@Preview`はカメラ操作・Service起動・設定保存を行わない。
 - 画面はSELFIE・カメラ接続・取説・アプリ情報の4つ。接続画面には権限、登録・解除、接続ヘルプを残す。
-- 取説は通信なしで読める。準備・設定・AF失敗・音・STOP・切断時の案内を掲載する。
+- 取説は4ステップと撮影直前AFの図、折りたたみ式FAQで構成し、通信なしで読める。AF失敗・音・STOP・切断・カメラ設定の案内を掲載する。
 - アプリ情報はアプリ名・バージョン・クレジット・GPL案内と元／改変プロジェクトへのリンクに整理する。GPL-3.0全文をAPK内に同梱し、オフラインのダイアログで表示する。
 - 通常リモコン、カスタムボタン、物理キー割り当て、通知ボタンサイズ、Broadcast controlを利用者向け機能から外す。
 - 通知には接続状態、撮影中の進行状況とSTOPを表示する。通常撮影・録画ボタンは表示しない。
@@ -52,6 +52,16 @@ AFタイムアウトはシャッターを解除して、エラー音を鳴らし
 - Serviceの撮影コマンドはSELFIE START / STOPのみ。旧通常リモコンと詳細シーケンスのIntentは実行しない。
 - 設定は既存DataStoreで保存し、復元が終わってからSTARTを有効にする。
 - `CameraBLE.kt` に変更を加えない。物理的に接続が切れた後の解除コマンドはカメラには送れないため、端末側の進行停止と再開防止を保証する。
+
+## UIの調整
+
+- 共通の色は `ui/selfie/SelfieTheme.kt`、余白・角丸・選択UIは `ui/components/SelfieComponents.kt` で定義する。
+- SELFIEの状態Previewは `SelfiePreviews.kt`、他の3画面は `ui/components/AppPreviews.kt` をAndroid StudioのSplit / Designで開く（PreviewはAPI 36）。
+- SELFIEのPreviewは未接続・待機・カウント・AF・撮影・AF失敗・終了・停止・切断・復元待ち・無限撮影・スキップあり終了を含む。小画面／大きな文字のPreviewも用意する。
+- 自動テストではAPI 36のNative Graphicsで14枚のCompose画面画像を `app/build/outputs/ui-previews/` に生成する。画像はGit管理対象外で、実機画面やMacのIDE Previewと区別する。
+- 各Previewは表示用サンプルと空のイベント処理を使う。実カメラ操作・ペアリング・Service・保存は実行しない。取説の折りたたみのみローカルに操作できる。
+- カウントは「AF開始まで」、進捗は「試行」と表示する。撮影中のSTOPは設定や状態のスクロール領域の外に置く。
+- 画面ホストのXML、システムのペアリング画面、既存の確認ダイアログと通知RemoteViewsは維持する。
 
 ## ビルド
 

@@ -1,0 +1,45 @@
+<resources>
+    <string name="ui_completed">COMPLETED</string>
+    <string name="ui_stopped">STOPPED</string>
+    <string name="ui_not_connected_hint">カメラを接続して、撮影を始めましょう。</string>
+    <string name="ui_single_note">「1枚」はカメラを単写モードに。</string>
+    <string name="ui_burst_note">連写はカメラ本体を連続撮影モードに。</string>
+    <string name="ui_sound_note">音OFFでもAF失敗音・終了音は鳴ります。</string>
+    <string name="ui_quick_start">まずは、この4ステップ。</string>
+    <string name="ui_step_connect">カメラを接続</string>
+    <string name="ui_step_connect_body">カメラのBluetoothリモコンをONにして、ペアリング。</string>
+    <string name="ui_step_settings">撮影条件を選択</string>
+    <string name="ui_step_settings_body">待機時間・撮影時間・試行回数を選びます。</string>
+    <string name="ui_step_start">STARTして、撮影位置へ</string>
+    <string name="ui_step_start_body">スマホを置いて、カウントダウン中に移動。</string>
+    <string name="ui_step_shoot">毎回AFして、自動撮影</string>
+    <string name="ui_step_shoot_body">撮影の合間にポーズを変えて、次のカウントダウンへ。</string>
+    <string name="ui_focus_title">ピントは、撮影直前に。</string>
+    <string name="ui_focus_flow" translatable="false">5 → 4 → 3 → 2 → 1 → AF → SHOT</string>
+    <string name="ui_focus_body">カウントダウン開始時ではなく、終了後に毎回AFします。ポーズや立ち位置が変わっても、その都度ピントを取り直します。</string>
+    <string name="ui_faq_capture">撮影</string>
+    <string name="ui_faq_connection">接続</string>
+    <string name="ui_faq_sound">音</string>
+    <string name="ui_faq_single">1枚だけ撮る</string>
+    <string name="ui_faq_single_body">カメラ本体を単写モードにして、「1枚」を選びます。アプリはシャッターを100ミリ秒押します。カメラが連写モードだと複数枚になる場合があります。</string>
+    <string name="ui_faq_burst">連写する</string>
+    <string name="ui_faq_burst_body">カメラ本体を連続撮影モードにして、0.5／1／2秒を選びます。合焦後にその時間だけ全押しを保持します。実際の枚数はカメラの設定によって変わります。</string>
+    <string name="ui_faq_failure">AFに失敗した場合</string>
+    <string name="ui_faq_infinite">回数・無限撮影・STOP</string>
+    <string name="ui_faq_infinite_body">回数は撮影の試行回数です。AF失敗によるスキップも1回に数えます。∞はSTOPまで続きます。画面や通知のSTOPで、カウントダウン・AF・撮影のどの段階でも停止できます。</string>
+    <string name="ui_faq_disconnect">画面OFF・Bluetooth切断</string>
+    <string name="ui_faq_camera">カメラ側の設定</string>
+    <string name="ui_faq_camera_body">BluetoothリモコンをONにし、AFモード・AFエリア・露出をカメラ本体で設定してください。アプリはこれらの設定やドライブモードを変更しません。</string>
+    <string name="ui_expand">詳細を開く</string>
+    <string name="ui_collapse">詳細を閉じる</string>
+    <string name="ui_expanded">展開中</string>
+    <string name="ui_collapsed">折りたたみ中</string>
+    <string name="ui_connection_subtitle">一度登録すれば、次回はカメラの電源を入れるだけ。</string>
+    <string name="ui_camera_ready">撮影の準備ができています。</string>
+    <string name="ui_permissions">必要な権限</string>
+    <string name="ui_permission_granted">許可済み</string>
+    <string name="ui_bluetooth_permission">Bluetooth</string>
+    <string name="ui_notification_permission">通知・STOP</string>
+    <string name="ui_camera_setup">カメラの準備</string>
+    <string name="ui_license_section">ライセンスとソース</string>
+</resources>

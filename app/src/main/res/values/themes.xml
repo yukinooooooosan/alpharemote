@@ -2,13 +2,14 @@
     <!-- Base application theme. -->
     <style name="Theme.BluetoothRemoteForSonyCameras" parent="Theme.MaterialComponents.DayNight.NoActionBar">
         <!-- Primary brand color. -->
-        <item name="colorPrimary">@color/midnight_light</item>
-        <item name="colorPrimaryVariant">@color/midnight</item>
+        <item name="colorPrimary">#506A47</item>
+        <item name="colorPrimaryVariant">#506A47</item>
         <item name="colorOnPrimary">@color/white</item>
         <!-- Secondary brand color. -->
-        <item name="colorSecondary">@color/fulvous</item>
-        <item name="colorSecondaryVariant">@color/ochre</item>
+        <item name="colorSecondary">#506A47</item>
+        <item name="colorSecondaryVariant">#506A47</item>
         <item name="colorOnSecondary">@color/white</item>
+        <item name="android:windowBackground">#F7F7F2</item>
         <!-- Status bar color. -->
         <item name="android:statusBarColor">?attr/colorPrimaryVariant</item>
 

@@ -1,59 +1,30 @@
 package org.staacks.alpharemote.ui.about
 
 import android.content.Intent
-import android.net.Uri
+import androidx.core.net.toUri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
-import androidx.core.view.updatePadding
+import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProvider
-import org.staacks.alpharemote.databinding.FragmentAboutBinding
+import org.staacks.alpharemote.BuildConfig
+import org.staacks.alpharemote.R
+import org.staacks.alpharemote.ui.selfie.SelfieTheme
 
 class AboutFragment : Fragment() {
-
-    private var _binding: FragmentAboutBinding? = null
-
-    private val binding get() = _binding!!
-
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
-        val aboutViewModel = ViewModelProvider(this)[AboutViewModel::class.java]
-
-        _binding = FragmentAboutBinding.inflate(inflater, container, false)
-        binding.fragment = this
-        binding.viewModel = aboutViewModel
-        val root: View = binding.root
-
-        ViewCompat.setOnApplyWindowInsetsListener(binding.linearLayout) { v, insets ->
-            val bars = insets.getInsets(WindowInsetsCompat.Type.systemBars() or WindowInsetsCompat.Type.displayCutout())
-            v.updatePadding(
-                left = bars.left,
-                top = bars.top,
-                right = bars.right,
-                bottom = bars.bottom,
-            )
-            WindowInsetsCompat.CONSUMED
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View =
+        ComposeView(requireContext()).apply {
+            id = R.id.about_compose_view
+            setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+            setContent { SelfieTheme { AboutScreen(BuildConfig.VERSION_NAME, BuildConfig.VERSION_CODE, ::showLicense, ::openURL) } }
         }
-
-        return root
-    }
 
     fun showLicense() {
         if (childFragmentManager.findFragmentByTag("license") == null)
             LicenseDialogFragment().show(childFragmentManager, "license")
     }
 
-    fun openURL(target: String) {
-        val uri = Uri.parse(target)
-        val intent = Intent(Intent.ACTION_VIEW, uri)
-        startActivity(intent)
-    }
-
-    override fun onDestroyView() {
-        super.onDestroyView()
-        _binding = null
-    }
+    fun openURL(target: String) { startActivity(Intent(Intent.ACTION_VIEW, target.toUri())) }
 }

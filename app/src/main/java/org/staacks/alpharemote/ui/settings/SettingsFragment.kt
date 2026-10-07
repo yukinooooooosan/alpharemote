@@ -1,7 +1,6 @@
 package org.staacks.alpharemote.ui.settings
 
 import android.Manifest
-import android.animation.LayoutTransition
 import android.app.Activity
 import android.app.AlertDialog
 import android.bluetooth.BluetoothAdapter
@@ -26,18 +25,16 @@ import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.IntentSenderRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.app.ActivityCompat
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
-import androidx.core.view.updatePadding
-import androidx.databinding.DataBindingUtil
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.ViewCompositionStrategy
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import org.staacks.alpharemote.ui.selfie.SelfieTheme
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.lifecycleScope
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import kotlinx.coroutines.launch
 import org.staacks.alpharemote.MainActivity
 import org.staacks.alpharemote.R
-import org.staacks.alpharemote.databinding.FragmentSettingsBinding
 import org.staacks.alpharemote.service.AlphaRemoteService
 import org.staacks.alpharemote.ui.help.HelpDialogFragment
 import org.staacks.alpharemote.ui.settings.CompanionDeviceHelper.pairCompanionDevice
@@ -45,8 +42,7 @@ import org.staacks.alpharemote.ui.settings.CompanionDeviceHelper.startObservingD
 
 class SettingsFragment : Fragment() {
 
-    private var _binding: FragmentSettingsBinding? = null
-    private val binding get() = _binding!!
+    private lateinit var settingsViewModel: SettingsViewModel
 
     val onDeviceFoundLauncher = registerForActivityResult(ActivityResultContracts.StartIntentSenderForResult()) { activityResult  ->
         Log.d(MainActivity.TAG, "Activity Result: $activityResult")
@@ -68,39 +64,10 @@ class SettingsFragment : Fragment() {
             container: ViewGroup?,
             savedInstanceState: Bundle?
     ): View {
-        val settingsViewModel = ViewModelProvider(this)[SettingsViewModel::class.java]
-
-        _binding = DataBindingUtil.inflate(inflater, R.layout.fragment_settings, container, false)
-        binding.lifecycleOwner = viewLifecycleOwner
-        binding.viewModel = settingsViewModel
-
-        viewLifecycleOwner.lifecycleScope.launch {
-            settingsViewModel.uiAction.collect{ action ->
-                when (action) {
-                    SettingsViewModel.SettingsUIAction.PAIR -> pair()
-                    SettingsViewModel.SettingsUIAction.UNPAIR -> unpair()
-                    SettingsViewModel.SettingsUIAction.REQUEST_BLUETOOTH_PERMISSION -> requestBluetoothPermission(bluetoothRequestPermissionLauncher, true)
-                    SettingsViewModel.SettingsUIAction.REQUEST_NOTIFICATION_PERMISSION -> requestNotificationPermission(true)
-                    SettingsViewModel.SettingsUIAction.HELP_CONNECTION ->
-                        HelpDialogFragment().setContent(
-                            R.string.help_settings_connection_troubleshooting_title,
-                            R.string.help_settings_connection_troubleshooting_text
-                        ).show(childFragmentManager, null)
-                }
-            }
-        }
-
-        binding.linearLayout.layoutTransition.enableTransitionType(LayoutTransition.CHANGING)
-
-        ViewCompat.setOnApplyWindowInsetsListener(binding.linearLayout) { v, insets ->
-            val bars = insets.getInsets(WindowInsetsCompat.Type.systemBars() or WindowInsetsCompat.Type.displayCutout())
-            v.updatePadding(
-                left = bars.left,
-                top = bars.top,
-                right = bars.right,
-                bottom = bars.bottom,
-            )
-            WindowInsetsCompat.CONSUMED
+        settingsViewModel = ViewModelProvider(this)[SettingsViewModel::class.java]
+        val root = ComposeView(requireContext()).apply {
+            id = R.id.connection_compose_view
+            setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
         }
 
         context?.registerReceiver(bondStateReceiver, IntentFilter(BluetoothDevice.ACTION_BOND_STATE_CHANGED))
@@ -113,7 +80,27 @@ class SettingsFragment : Fragment() {
         checkNotificationPermissionState()
         checkAssociations()
 
-        return binding.root
+        return root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        (view as ComposeView).setContent {
+            val state by settingsViewModel.uiState.collectAsStateWithLifecycle()
+            SelfieTheme { ConnectionScreen(state, ::handleAction) }
+        }
+    }
+
+    private fun handleAction(action: SettingsViewModel.SettingsUIAction) {
+        when (action) {
+            SettingsViewModel.SettingsUIAction.PAIR -> pair()
+            SettingsViewModel.SettingsUIAction.UNPAIR -> unpair()
+            SettingsViewModel.SettingsUIAction.REQUEST_BLUETOOTH_PERMISSION -> requestBluetoothPermission(bluetoothRequestPermissionLauncher, true)
+            SettingsViewModel.SettingsUIAction.REQUEST_NOTIFICATION_PERMISSION -> requestNotificationPermission(true)
+            SettingsViewModel.SettingsUIAction.HELP_CONNECTION -> HelpDialogFragment().setContent(
+                R.string.help_settings_connection_troubleshooting_title,
+                R.string.help_settings_connection_troubleshooting_text
+            ).show(childFragmentManager, null)
+        }
     }
 
     override fun onResume() {
@@ -123,6 +110,10 @@ class SettingsFragment : Fragment() {
         // have no other method to detect a change of the "Bluetooth Scanning" setting if the user
         // just switched to its settings to toggle it.
         checkLocationServiceState()
+        checkBluetoothState()
+        checkBluetoothPermissionState()
+        checkNotificationPermissionState()
+        checkAssociations()
     }
 
     override fun onDestroyView() {
@@ -130,7 +121,6 @@ class SettingsFragment : Fragment() {
         context?.unregisterReceiver(bondStateReceiver)
         context?.unregisterReceiver(bluetoothStateReceiver)
         context?.unregisterReceiver(locationServiceStateReceiver)
-        _binding = null
     }
 
     private val bondStateReceiver = object : BroadcastReceiver() {
@@ -175,7 +165,7 @@ class SettingsFragment : Fragment() {
 
                     override fun onFailure(error: CharSequence?) {
                         Log.d(MainActivity.TAG, "onFailure")
-                        binding.viewModel?.reportErrorState(error.toString())
+                        settingsViewModel.reportErrorState(error.toString())
                     }
                 })
             }
@@ -199,14 +189,14 @@ class SettingsFragment : Fragment() {
 
     private fun checkBluetoothPermissionState(): Boolean {
         val bluetoothGranted = (ActivityCompat.checkSelfPermission(requireContext(), Manifest.permission.BLUETOOTH_CONNECT) == PackageManager.PERMISSION_GRANTED)
-        binding.viewModel?.updateBluetoothPermissionState(bluetoothGranted)
+        settingsViewModel.updateBluetoothPermissionState(bluetoothGranted)
         return bluetoothGranted
     }
 
     private fun checkNotificationPermissionState(): Boolean {
         val notificationsGranted = (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU
                 || (ActivityCompat.checkSelfPermission(requireContext(), Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED))
-        binding.viewModel?.updateNotificationPermissionState(notificationsGranted)
+        settingsViewModel.updateNotificationPermissionState(notificationsGranted)
         return notificationsGranted
     }
 
@@ -277,12 +267,12 @@ class SettingsFragment : Fragment() {
             false
         }
 
-        binding.viewModel?.updateAssociationState(address, isAssociated, isBonded)
+        settingsViewModel.updateAssociationState(address, isAssociated, isBonded)
     }
 
     private fun checkBluetoothState() {
         val enabled = BluetoothAdapter.getDefaultAdapter().state == BluetoothAdapter.STATE_ON
-        binding.viewModel?.updateBluetoothState(enabled)
+        settingsViewModel.updateBluetoothState(enabled)
     }
 
     private fun checkLocationServiceState() {
@@ -292,7 +282,7 @@ class SettingsFragment : Fragment() {
         } catch (_: Exception) {
             true // In this case, the setting has probably never been touched, which should be fine.
         }
-        binding.viewModel?.updateLocationServiceState(locationManager.isLocationEnabled, bleScanning)
+        settingsViewModel.updateLocationServiceState(locationManager.isLocationEnabled, bleScanning)
     }
 
 }

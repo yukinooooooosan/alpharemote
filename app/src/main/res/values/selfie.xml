@@ -27,7 +27,7 @@
     <string name="selfie_sound">カウントダウン音</string>
     <string name="selfie_seconds_display" tools:ignore="PluralsCandidate">%1$d sec</string>
     <string name="selfie_ready">スマホを置いて、撮影位置へ。</string>
-    <string name="selfie_next_shot">次の撮影まで</string>
+    <string name="selfie_next_shot">AF開始まで</string>
     <string name="selfie_focusing" translatable="false">FOCUSING</string>
     <string name="selfie_shooting" translatable="false">SHOOTING</string>
     <string name="selfie_focus_hint">今の立ち位置でピントを合わせています</string>
@@ -40,8 +40,8 @@
     <string name="selfie_drive_hint">連写を使う場合はカメラ本体を連続撮影モードに。「1枚」は単写モードで使ってください。</string>
     <string name="selfie_sound_hint">AF失敗音と終了音は常に鳴ります。音量はスマホのアラーム音量で調整できます。</string>
     <string name="selfie_progress">試行 %1$d回 · 撮影操作 %2$d回 · スキップ %3$d回</string>
-    <string name="selfie_cycle_progress" translatable="false">%1$d / %2$s</string>
-    <string name="selfie_countdown_notification">撮影まで %1$d秒</string>
+    <string name="selfie_cycle_progress">試行 %1$d / %2$s</string>
+    <string name="selfie_countdown_notification">AF開始まで %1$d秒</string>
     <string name="selfie_fork_credit">このアプリはSebastian Staacksによるα-Remoteの改変版（GPL-3.0）です。Sony公式アプリではありません。</string>
     <string name="selfie_source">改変版のソースコード</string>
     <string name="selfie_source_url" translatable="false">https://github.com/yukinooooooosan/alpharemote/tree/feature/selfie-mode</string>

@@ -18,7 +18,7 @@
     <string name="selfie_sound">Countdown-Ton</string>
     <string name="selfie_seconds_display" tools:ignore="PluralsCandidate">%1$d s</string>
     <string name="selfie_ready">Handy ablegen und Position einnehmen.</string>
-    <string name="selfie_next_shot">Bis zur nächsten Aufnahme</string>
+    <string name="selfie_next_shot">Bis zum AF</string>
     <string name="selfie_focus_hint">Die Kamera fokussiert auf deine aktuelle Position</string>
     <string name="selfie_shoot_hint">Pose halten.</string>
     <string name="selfie_af_failed">AF fehlgeschlagen · Versuch übersprungen</string>
@@ -29,7 +29,8 @@
     <string name="selfie_drive_hint">Für Serienaufnahmen die Kamera auf Serienbildmodus stellen. Für „1 Bild“ den Einzelbildmodus verwenden.</string>
     <string name="selfie_sound_hint">AF-Fehler und Ende bleiben hörbar. Die Lautstärke wird über die Weckerlautstärke des Handys eingestellt.</string>
     <string name="selfie_progress">Versuche %1$d · Auslösungen %2$d · Übersprungen %3$d</string>
-    <string name="selfie_countdown_notification">Aufnahme in %1$d s</string>
+    <string name="selfie_countdown_notification">AF in %1$d Sekunden</string>
     <string name="selfie_fork_credit">Diese App ist eine modifizierte Version von α-Remote von Sebastian Staacks (GPL-3.0). Sie ist keine offizielle Sony-App.</string>
     <string name="selfie_source">Quellcode der modifizierten App</string>
+    <string name="selfie_cycle_progress">Versuch %1$d / %2$s</string>
 </resources>

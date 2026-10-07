@@ -99,3 +99,28 @@ Macでプレビュー調整、N100でテスト・APKビルド・署名を行う�
 
 **実機確認の現状：** ユーザーがPixel 10 Proで5秒待機・5枚撮影を確認済み。Compose移行前の報告で、使用APK版とカメラ設定の詳細は未記録。網羅的な実機確認は未完了。
 新しいCompose版APKの実機動作とMacのAndroid Studio上でのPreview表示は、このN100環境では検証していない。Robolectricの描画確認とIDEの実操作確認は区別する。実機チェックリストは未確認の詳細条件を残し、mainへはマージしない。
+
+## 0.1.5：4画面とタブをComposeに統一
+
+SELFIE・カメラ接続・取説・アプリ情報と下部タブをCompose / Material 3へ移行した。
+Fragmentと既存ナビゲーションのホストは維持し、登録・解除・Companion Device・権限要求は既存処理へ接続する。
+共通テーマは通常／ダークとも色数を抑え、余白・角丸・文字を統一した。
+SELFIEは一体型の選択UIに変更し、実行中のSTOPを状態のスクロール領域から独立させた。
+カウントは「AF開始まで」、進捗は「試行」と表示する。取説は4ステップ・撮影直前AFの図・折りたたみFAQに整理した。
+versionCodeは6、versionNameは0.1.5。
+
+- `testDebugUnitTest assembleDebug lintDebug --no-daemon`：成功。
+- 全59件成功、失敗・エラー・スキップ0件。API 31 / 36の画面・通知・シーケンステストを維持した。
+- SELFIEの12状態×通常／ダーク、接続の8状態×通常／ダーク、取説のFAQ開閉、アプリ情報のクレジット・ソースリンクを確認した。
+- タブを実際に押した画面遷移、戻ったときの取説の開閉状態、Activity再生成時の選択タブ／開閉状態の復元を確認した。
+- 未接続STARTの接続案内と、既存のペアリング準備ダイアログ／キャンセルへの接続を確認した。実際のカメラ登録は未検証。
+- GPLボタンから同梱ライセンス全文をオフラインで開けることを確認した。本文はrootのLICENSEと同一。
+- 小画面（320×480dp）・文字倍率1.5で、撮影中のSTOPが表示され、有効なことを確認した。
+- カメラ操作を伴わないCompose Previewを維持した。SELFIEの停止・切断・設定復元待ち・無限撮影・スキップあり終了、接続の権限待ち・ペアリング未完了等を追加した。
+- API 36 / Robolectric Native Graphicsで、4画面とカウント／AF／撮影の通常・ダーク計14枚を生成し、見た目を確認した。生成先は `app/build/outputs/ui-previews/`（Git対象外）。MacのIDE Previewとは別の検証。
+- Android lint：エラー0件、警告106件。未使用になった旧画面のリソース、上流由来の非推奨API等を含む。
+- APK署名検証：成功。証明書SHA-256は既存APKと同じ `c8a131c390f88da5600d8163649eaf721fccfaf66898776756d38263d2b6d0e1`。アプリIDを維持し、上書き可能。
+- BLE・Service・撮影Controller・SelfieViewModel・SettingsViewModel・DataStore・LICENSEに今回の差分なし。通知の変更はカウントダウン文言のみ。
+- 端末固有のMac／N100手順書はローカルで更新し、引き続きGit管理対象外とした。
+
+**実機確認の現状：** Pixel 10 Proで5秒待機・5枚撮影はユーザー確認済み（Compose移行前、APK版未記録）。0.1.5での実機確認、ペアリング・画面OFF・切断などの網羅的確認と、MacのAndroid StudioでのPreview操作は未検証。mainにはマージしない。

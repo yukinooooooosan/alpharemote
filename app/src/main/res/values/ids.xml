@@ -1,3 +1,6 @@
 <resources>
     <item name="selfie_compose_view" type="id" />
+    <item name="connection_compose_view" type="id" />
+    <item name="manual_compose_view" type="id" />
+    <item name="about_compose_view" type="id" />
 </resources>

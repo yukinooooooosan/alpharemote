@@ -31,13 +31,13 @@ import org.staacks.alpharemote.service.AlphaRemoteService
 class SelfieScreenTest {
     @get:Rule val compose = createComposeRule()
 
-    @Test fun allSevenSampleStatesRenderInLightMode() = checkSamples(dark = false)
-    @Test fun allSevenSampleStatesRenderInDarkMode() = checkSamples(dark = true)
+    @Test fun allSampleStatesRenderInLightMode() = checkSamples(dark = false)
+    @Test fun allSampleStatesRenderInDarkMode() = checkSamples(dark = true)
 
     private fun checkSamples(dark: Boolean) {
         val state = mutableStateOf(SelfieUiState())
         compose.setContent { SelfieTheme(dark) { SelfieScreen(state.value, onAction = {}) } }
-        val expectedPhases = listOf("5 sec", "5 sec", "3", "FOCUSING", "SHOOTING", "AF ×", "5 sec")
+        val expectedPhases = listOf("5 sec", "5 sec", "3", "FOCUSING", "SHOOTING", "AF ×", "COMPLETED", "STOPPED", "—", "5 sec", "5", "COMPLETED")
         SelfiePreviewSamples.samples.forEachIndexed { index, sample ->
             compose.runOnIdle { state.value = sample.state }
             compose.onNodeWithTag("phase_display").assertIsDisplayed().assertTextEquals(expectedPhases[index])
@@ -48,14 +48,14 @@ class SelfieScreenTest {
             if (sample.state.session.running) {
                 compose.onNodeWithTag("options").assertDoesNotExist()
                 compose.onNodeWithTag("camera_settings").assertDoesNotExist()
-                compose.onNodeWithTag("progress").assertTextEquals("2 / 5")
+                compose.onNodeWithTag("progress").assertTextEquals("試行 ${sample.state.session.attempts + 1} / ${if (sample.state.session.targetCycles == 0) "∞" else sample.state.session.targetCycles}")
             } else {
                 compose.onNodeWithTag("options").assertExists()
                 compose.onNodeWithTag("camera_settings").assertExists()
             }
         }
         compose.onNodeWithTag("phase_hint").assertTextEquals("撮影終了")
-        compose.onNodeWithTag("progress").assertTextEquals("試行 5回 · 撮影操作 5回 · スキップ 0回")
+        compose.onNodeWithTag("progress").assertTextEquals("試行 5回 · 撮影操作 3回 · スキップ 2回")
     }
 
     @Test fun settingsAndButtonsEmitEventsWithoutOperatingCamera() {
@@ -101,6 +101,15 @@ class SelfieScreenTest {
         compose.onNodeWithTag("phase_display").assertTextEquals("—")
         compose.onNodeWithTag("start_stop").assertTextEquals("START")
         compose.onNodeWithTag("options").assertExists()
+    }
+
+    @Test
+    @Config(qualifiers = "ja-w320dp-h480dp")
+    fun stopStaysVisibleWithLargeTextOnSmallScreen() {
+        RuntimeEnvironment.setFontScale(1.5f)
+        compose.setContent { SelfieTheme { SelfieScreen(SelfiePreviewSamples.samples[3].state, onAction = {}) } }
+        compose.onNodeWithTag("start_stop").assertIsDisplayed().assertIsEnabled().assertTextEquals("STOP")
+        compose.onNodeWithTag("options").assertDoesNotExist()
     }
 
     @Test fun actualPreviewClicksCannotStartOrStopServiceOrSaveSettings() {
