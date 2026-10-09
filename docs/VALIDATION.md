@@ -124,3 +124,22 @@ versionCodeは6、versionNameは0.1.5。
 - 端末固有のMac／N100手順書はローカルで更新し、引き続きGit管理対象外とした。
 
 **実機確認の現状：** Pixel 10 Proで5秒待機・5枚撮影はユーザー確認済み（Compose移行前、APK版未記録）。0.1.5での実機確認、ペアリング・画面OFF・切断などの網羅的確認と、MacのAndroid StudioでのPreview操作は未検証。mainにはマージしない。
+
+
+## 0.1.6：シンプル／kawaiiのスキン切り替え
+
+2026-10-09。既存の見た目をシンプルとして維持し、ピンク・ラベンダー、太い文字、丸い部品と小さなハート／星を使うkawaiiを追加した。
+設定タブの「外観」から選び、Activity共通のViewModelと独立したDataStoreキー `uiSkin` で4画面・下部タブへ反映する。初期値・不明な保存値はシンプル。通常／ダークは端末に従う。
+versionCodeは7、versionNameは0.1.6。
+
+- `testDebugUnitTest assembleDebug lintDebug --no-daemon`：成功。全67件、失敗・エラー・スキップ0件。
+- 両スキン×12状態×通常／ダークのSELFIE表示、設定の非表示、START / STOP、接続状態と進捗をAPI 31 / 36で確認した。320×480dp・文字倍率1.5でも両スキンのSTOPが表示され、有効。
+- 保存値の復元、未保存・不明値の初期値、撮影設定／登録カメラの維持、実際の設定タブでの切り替え、画面移動とActivity再生成後の復元、連続切り替えの最終値保存を確認した。スキン変更前後のServiceの撮影状態も同一。
+- Compose Previewは実行時ViewModelから分離したまま、SELFIE48状態と小画面2状態、接続32状態、取説・設定各4状態を用意した。
+- API 36 / Robolectric Native Graphicsで4画面とカウント／AF／撮影の両スキン×通常／ダーク計28枚を生成した。シンプルのSELFIE通常／ダーク画像はv0.1.5の対応画像とSHA-256が一致した。MacのIDE Previewとは別の検証。
+- Android lint：エラー0件、警告106件。旧画面の未使用リソース・上流由来の非推奨API等を含み、件数は前の版と同じ。
+- APK署名検証：成功。既存と同じ証明書SHA-256 `c8a131c390f88da5600d8163649eaf721fccfaf66898776756d38263d2b6d0e1` とアプリIDを維持。
+- CameraBLE・Service・撮影Controller・SelfieViewModel・撮影設定の仕様・GPL本文に差分なし。DataStoreにはスキン専用の読み書きだけを追加した。
+- 端末固有のMac／N100手順はローカルだけで更新し、Gitと配布ソースから除外する。
+
+**実機確認の現状：** Pixel 10 Proで5秒待機・5枚撮影はユーザー確認済み（Compose移行前、APK版未記録）。0.1.6の実機動作、網羅的な撮影確認とMacのAndroid StudioでのPreview操作は未検証。mainにはマージしない。

@@ -15,6 +15,7 @@ import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
 import org.robolectric.annotation.GraphicsMode
 import org.staacks.alpharemote.ui.about.AboutScreen
+import org.staacks.alpharemote.ui.appearance.AppSkin
 import org.staacks.alpharemote.ui.components.ConnectionPreviewSamples
 import org.staacks.alpharemote.ui.manual.ManualScreen
 import org.staacks.alpharemote.ui.selfie.SelfiePreviewSamples
@@ -35,14 +36,15 @@ class ComposeRenderTest {
     @Test fun captureFourPagesAndRunningStatesInBothThemes() {
         val page = mutableStateOf("selfie")
         val dark = mutableStateOf(false)
+        val skin = mutableStateOf(AppSkin.SIMPLE)
         val sample = mutableStateOf(SelfiePreviewSamples.samples[1].state)
         compose.setContent {
-            SelfieTheme(dark.value) {
+            SelfieTheme(dark.value, skin.value) {
                 // Each capture starts at the top, as in a fresh IDE preview.
-                key(page.value, dark.value) {
+                key(page.value, dark.value, skin.value) {
                     when (page.value) {
                         "manual" -> ManualScreen()
-                        "about" -> AboutScreen("0.1.5", 6, {}, {})
+                        "about" -> AboutScreen("0.1.6", 7, {}, {}, skin = skin.value)
                         "connection" -> ConnectionScreen(ConnectionPreviewSamples.ready, {})
                         else -> SelfieScreen(sample.value, {})
                     }
@@ -50,24 +52,27 @@ class ComposeRenderTest {
             }
         }
         val directory = File("build/outputs/ui-previews").apply { mkdirs() }
-        listOf(false, true).forEach { mode ->
-            listOf("selfie", "connection", "manual", "about", "countdown", "focusing", "shooting").forEach { name ->
-                compose.runOnIdle {
-                    dark.value = mode
-                    page.value = name
-                    sample.value = SelfiePreviewSamples.samples[when (name) {
-                        "countdown" -> 2; "focusing" -> 3; "shooting" -> 4; else -> 1
-                    }].state
+        AppSkin.entries.forEach { style ->
+            listOf(false, true).forEach { mode ->
+                listOf("selfie", "connection", "manual", "about", "countdown", "focusing", "shooting").forEach { name ->
+                    compose.runOnIdle {
+                        dark.value = mode
+                        skin.value = style
+                        page.value = name
+                        sample.value = SelfiePreviewSamples.samples[when (name) {
+                            "countdown" -> 2; "focusing" -> 3; "shooting" -> 4; else -> 1
+                        }].state
+                    }
+                    val bitmap = compose.onRoot().captureToImage().asAndroidBitmap()
+                    assertTrue(bitmap.width > 0 && bitmap.height > 0)
+                    val colors = mutableSetOf<Int>()
+                    for (y in 0 until bitmap.height step 8) for (x in 0 until bitmap.width step 8) colors.add(bitmap.getPixel(x, y))
+                    assertTrue("$name capture must contain rendered content", colors.size > 10)
+                    File(directory, "${style.storageId}-$name-${if (mode) "dark" else "light"}.png").outputStream().use {
+                        bitmap.compress(Bitmap.CompressFormat.PNG, 100, it)
+                    }
                 }
-                val bitmap = compose.onRoot().captureToImage().asAndroidBitmap()
-                assertTrue(bitmap.width > 0 && bitmap.height > 0)
-                val colors = mutableSetOf<Int>()
-                for (y in 0 until bitmap.height step 8) for (x in 0 until bitmap.width step 8) colors.add(bitmap.getPixel(x, y))
-                assertTrue("$name capture must contain rendered content", colors.size > 10)
-                File(directory, "$name-${if (mode) "dark" else "light"}.png").outputStream().use {
-                    bitmap.compress(Bitmap.CompressFormat.PNG, 100, it)
-                }
-            }
+        }
         }
     }
 }

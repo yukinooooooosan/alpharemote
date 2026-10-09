@@ -7,13 +7,24 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import org.staacks.alpharemote.R
+import org.staacks.alpharemote.ui.appearance.AppSkin
 import org.staacks.alpharemote.ui.components.*
 
 /** Version and callbacks are inputs, so previews never launch external activities. */
 @Composable
-fun AboutScreen(versionName: String, versionCode: Int, onLicense: () -> Unit, onOpenSource: (String) -> Unit) {
+fun AboutScreen(versionName: String, versionCode: Int, onLicense: () -> Unit, onOpenSource: (String) -> Unit,
+                skin: AppSkin = AppSkin.SIMPLE, skinLoaded: Boolean = true, onSkinChange: (AppSkin) -> Unit = {}) {
     SelfiePage("about_screen") {
-        SelfiePageTitle(stringResource(R.string.selfie_about_title))
+        SelfiePageTitle(stringResource(R.string.ui_preferences_title))
+        SelfieSection(stringResource(R.string.ui_appearance)) {
+            SelfieSegmentedControl(stringResource(R.string.ui_skin), listOf(
+                AppSkin.SIMPLE.ordinal to stringResource(R.string.ui_skin_simple),
+                AppSkin.KAWAII.ordinal to stringResource(R.string.ui_skin_kawaii)),
+                selected = skin.ordinal, enabled = skinLoaded, tag = "skin") { value ->
+                onSkinChange(AppSkin.entries[value])
+            }
+            SelfieNote(stringResource(R.string.ui_skin_hint))
+        }
         SelfieSection {
             Text(stringResource(R.string.app_name), style = MaterialTheme.typography.headlineSmall)
             SelfieNote(stringResource(R.string.about_version_info, versionName, versionCode))

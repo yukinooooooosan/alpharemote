@@ -16,7 +16,7 @@ fun SelfieNavigationBar(selected: Int, onSelect: (Int) -> Unit) {
             Triple(R.id.navigation_selfie, R.drawable.ic_camera_black_24dp, R.string.selfie_title),
             Triple(R.id.navigation_settings, R.drawable.ic_settings_black_24dp, R.string.selfie_connection_title),
             Triple(R.id.navigation_manual, R.drawable.baseline_text_snippet_24, R.string.manual_title),
-            Triple(R.id.navigation_about, R.drawable.ic_about_black_24dp, R.string.selfie_about_title),
+            Triple(R.id.navigation_about, R.drawable.ic_about_black_24dp, R.string.ui_settings_tab),
         ).forEach { (id, icon, label) ->
             NavigationBarItem(selected == id, { onSelect(id) },
                 icon = { Icon(painterResource(icon), contentDescription = null) },

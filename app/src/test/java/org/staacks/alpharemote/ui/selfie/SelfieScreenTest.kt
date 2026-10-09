@@ -25,6 +25,7 @@ import org.staacks.alpharemote.selfie.SelfiePhase
 import org.staacks.alpharemote.selfie.SelfieSettings
 import org.staacks.alpharemote.selfie.SelfieState
 import org.staacks.alpharemote.service.AlphaRemoteService
+import org.staacks.alpharemote.ui.appearance.AppSkin
 
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [31, 36], qualifiers = "ja-w393dp-h800dp")
@@ -36,23 +37,26 @@ class SelfieScreenTest {
 
     private fun checkSamples(dark: Boolean) {
         val state = mutableStateOf(SelfieUiState())
-        compose.setContent { SelfieTheme(dark) { SelfieScreen(state.value, onAction = {}) } }
+        val skin = mutableStateOf(AppSkin.SIMPLE)
+        compose.setContent { SelfieTheme(dark, skin.value) { SelfieScreen(state.value, onAction = {}) } }
         val expectedPhases = listOf("5 sec", "5 sec", "3", "FOCUSING", "SHOOTING", "AF ×", "COMPLETED", "STOPPED", "—", "5 sec", "5", "COMPLETED")
-        SelfiePreviewSamples.samples.forEachIndexed { index, sample ->
-            compose.runOnIdle { state.value = sample.state }
-            compose.onNodeWithTag("phase_display").assertIsDisplayed().assertTextEquals(expectedPhases[index])
-            compose.onNodeWithTag("connection_status")
-                .assertTextEquals(if (sample.state.connected) "● 接続済み" else "○ カメラ未接続")
-            compose.onNodeWithTag("start_stop").assertIsDisplayed()
-                .assertTextEquals(if (sample.state.session.running) "STOP" else "START")
-            if (sample.state.session.running) {
-                compose.onNodeWithTag("options").assertDoesNotExist()
-                compose.onNodeWithTag("camera_settings").assertDoesNotExist()
-                compose.onNodeWithTag("progress").assertTextEquals("試行 ${sample.state.session.attempts + 1} / ${if (sample.state.session.targetCycles == 0) "∞" else sample.state.session.targetCycles}")
-            } else {
-                compose.onNodeWithTag("options").assertExists()
-                compose.onNodeWithTag("camera_settings").assertExists()
-            }
+        AppSkin.entries.forEach { style ->
+            SelfiePreviewSamples.samples.forEachIndexed { index, sample ->
+                compose.runOnIdle { state.value = sample.state; skin.value = style }
+                compose.onNodeWithTag("phase_display").assertIsDisplayed().assertTextEquals(expectedPhases[index])
+                compose.onNodeWithTag("connection_status")
+                    .assertTextEquals(if (sample.state.connected) "● 接続済み" else "○ カメラ未接続")
+                compose.onNodeWithTag("start_stop").assertIsDisplayed()
+                    .assertTextEquals(if (sample.state.session.running) "STOP" else "START")
+                if (sample.state.session.running) {
+                    compose.onNodeWithTag("options").assertDoesNotExist()
+                    compose.onNodeWithTag("camera_settings").assertDoesNotExist()
+                    compose.onNodeWithTag("progress").assertTextEquals("試行 ${sample.state.session.attempts + 1} / ${if (sample.state.session.targetCycles == 0) "∞" else sample.state.session.targetCycles}")
+                } else {
+                    compose.onNodeWithTag("options").assertExists()
+                    compose.onNodeWithTag("camera_settings").assertExists()
+                }
+        }
         }
         compose.onNodeWithTag("phase_hint").assertTextEquals("撮影終了")
         compose.onNodeWithTag("progress").assertTextEquals("試行 5回 · 撮影操作 3回 · スキップ 2回")
@@ -107,7 +111,12 @@ class SelfieScreenTest {
     @Config(qualifiers = "ja-w320dp-h480dp")
     fun stopStaysVisibleWithLargeTextOnSmallScreen() {
         RuntimeEnvironment.setFontScale(1.5f)
-        compose.setContent { SelfieTheme { SelfieScreen(SelfiePreviewSamples.samples[3].state, onAction = {}) } }
+        val skin = mutableStateOf(AppSkin.SIMPLE)
+        compose.setContent { SelfieTheme(skin = skin.value) { SelfieScreen(SelfiePreviewSamples.samples[3].state, onAction = {}) } }
+        AppSkin.entries.forEach { style ->
+            compose.runOnIdle { skin.value = style }
+            compose.onNodeWithTag("start_stop").assertIsDisplayed().assertIsEnabled().assertTextEquals("STOP")
+        }
         compose.onNodeWithTag("start_stop").assertIsDisplayed().assertIsEnabled().assertTextEquals("STOP")
         compose.onNodeWithTag("options").assertDoesNotExist()
     }

@@ -41,4 +41,10 @@
     <string name="ui_notification_permission">Benachrichtigungen und STOP</string>
     <string name="ui_camera_setup">Kamera vorbereiten</string>
     <string name="ui_license_section">Lizenz und Quellcode</string>
+    <string name="ui_preferences_title">Einstellungen und App-Info</string>
+    <string name="ui_settings_tab">Einstellungen</string>
+    <string name="ui_appearance">Darstellung</string>
+    <string name="ui_skin">Design</string>
+    <string name="ui_skin_simple">Schlicht</string>
+    <string name="ui_skin_hint">Hell oder dunkel folgt den Geräteeinstellungen.</string>
 </resources>

@@ -17,6 +17,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import org.staacks.alpharemote.R
+import org.staacks.alpharemote.ui.appearance.AppSkin
 import org.staacks.alpharemote.selfie.SelfiePhase
 import org.staacks.alpharemote.ui.components.*
 
@@ -30,7 +31,10 @@ fun SelfieScreen(state: SelfieUiState, onAction: (SelfieUiAction) -> Unit, modif
             .padding(horizontal = 24.dp, vertical = 16.dp)) {
             Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
                 Column(Modifier.weight(1f)) {
-                    Text(stringResource(R.string.app_name), style = MaterialTheme.typography.titleLarge)
+                    Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        Text(stringResource(R.string.app_name), style = MaterialTheme.typography.titleLarge)
+                        if (LocalSelfieSkin.current == AppSkin.KAWAII) KawaiiAccent()
+                    }
                     Text(stringResource(if (state.connected) R.string.selfie_connected else R.string.selfie_offline),
                         Modifier.padding(top = 4.dp).testTag("connection_status"), style = MaterialTheme.typography.labelMedium,
                         color = if (state.connected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant)
@@ -100,9 +104,13 @@ private fun PhaseDisplay(state: SelfieUiState) {
         else -> stringResource(R.string.selfie_seconds_display, state.settings.countdownSeconds)
     }
     Text(phaseText, Modifier.fillMaxWidth().heightIn(min = 128.dp).wrapContentHeight().testTag("phase_display"),
-        textAlign = TextAlign.Center, fontWeight = FontWeight.Light,
+        textAlign = TextAlign.Center, fontWeight = if (LocalSelfieSkin.current == AppSkin.KAWAII) FontWeight.ExtraBold else FontWeight.Light,
         fontSize = when { session.phase == SelfiePhase.COUNTDOWN -> 104.sp; session.phase == SelfiePhase.IDLE -> 64.sp; else -> 34.sp },
-        color = if (session.phase == SelfiePhase.ERROR) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onBackground)
+        color = when {
+            session.phase == SelfiePhase.ERROR -> MaterialTheme.colorScheme.error
+            LocalSelfieSkin.current == AppSkin.KAWAII -> MaterialTheme.colorScheme.primary
+            else -> MaterialTheme.colorScheme.onBackground
+        })
     val hint = when (session.phase) {
         SelfiePhase.COUNTDOWN -> R.string.selfie_next_shot
         SelfiePhase.FOCUSING -> R.string.selfie_focus_hint

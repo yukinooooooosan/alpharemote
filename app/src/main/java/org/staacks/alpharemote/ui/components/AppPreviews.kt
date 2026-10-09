@@ -1,5 +1,6 @@
 package org.staacks.alpharemote.ui.components
 
+import org.staacks.alpharemote.ui.appearance.AppSkin
 import android.content.res.Configuration
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
@@ -46,4 +47,23 @@ fun ManualPreview() { SelfieTheme { ManualScreen() } }
 @Preview(name = "通常", group = "アプリ情報", widthDp = 393, heightDp = 800, apiLevel = 36, locale = "ja", uiMode = Configuration.UI_MODE_NIGHT_NO)
 @Preview(name = "ダーク", group = "アプリ情報", widthDp = 393, heightDp = 800, apiLevel = 36, locale = "ja", uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
-fun AboutPreview() { SelfieTheme { AboutScreen("0.1.5", 6, onLicense = {}, onOpenSource = {}) } }
+fun AboutPreview() { SelfieTheme { AboutScreen("0.1.6", 7, onLicense = {}, onOpenSource = {}) } }
+
+@Preview(name = "通常", group = "カメラ接続・kawaii", widthDp = 393, heightDp = 800, apiLevel = 36, locale = "ja", uiMode = Configuration.UI_MODE_NIGHT_NO)
+@Preview(name = "ダーク", group = "カメラ接続・kawaii", widthDp = 393, heightDp = 800, apiLevel = 36, locale = "ja", uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+fun ConnectionKawaiiPreview(@PreviewParameter(ConnectionPreviewProvider::class) state: SettingsUIState) {
+    SelfieTheme(skin = AppSkin.KAWAII) { ConnectionScreen(state, onAction = {}) }
+}
+
+@Preview(name = "通常", group = "取説・kawaii", widthDp = 393, heightDp = 800, apiLevel = 36, locale = "ja", uiMode = Configuration.UI_MODE_NIGHT_NO)
+@Preview(name = "ダーク", group = "取説・kawaii", widthDp = 393, heightDp = 800, apiLevel = 36, locale = "ja", uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+fun ManualKawaiiPreview() { SelfieTheme(skin = AppSkin.KAWAII) { ManualScreen() } }
+
+@Preview(name = "通常", group = "設定・kawaii", widthDp = 393, heightDp = 800, apiLevel = 36, locale = "ja", uiMode = Configuration.UI_MODE_NIGHT_NO)
+@Preview(name = "ダーク", group = "設定・kawaii", widthDp = 393, heightDp = 800, apiLevel = 36, locale = "ja", uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+fun AboutKawaiiPreview() {
+    SelfieTheme(skin = AppSkin.KAWAII) { AboutScreen("0.1.6", 7, {}, {}, skin = AppSkin.KAWAII) }
+}

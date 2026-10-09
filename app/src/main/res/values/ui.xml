@@ -42,4 +42,11 @@
     <string name="ui_notification_permission">通知・STOP</string>
     <string name="ui_camera_setup">カメラの準備</string>
     <string name="ui_license_section">ライセンスとソース</string>
+    <string name="ui_preferences_title">設定・アプリ情報</string>
+    <string name="ui_settings_tab">設定</string>
+    <string name="ui_appearance">外観</string>
+    <string name="ui_skin">スキン</string>
+    <string name="ui_skin_simple">シンプル</string>
+    <string name="ui_skin_kawaii" translatable="false">kawaii</string>
+    <string name="ui_skin_hint">明るさは端末の設定に合わせます。</string>
 </resources>

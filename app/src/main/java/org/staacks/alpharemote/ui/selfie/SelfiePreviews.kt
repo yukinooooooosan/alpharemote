@@ -1,5 +1,6 @@
 package org.staacks.alpharemote.ui.selfie
 
+import org.staacks.alpharemote.ui.appearance.AppSkin
 import android.content.res.Configuration
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
@@ -60,4 +61,20 @@ fun SelfiePreview(@PreviewParameter(SelfiePreviewProvider::class) state: SelfieU
 @Composable
 fun SelfieAccessiblePreview() {
     SelfiePreview(SelfiePreviewSamples.samples[3].state)
+}
+
+@Preview(name = "通常", group = "SELFIE・kawaii", widthDp = 393, heightDp = 800, apiLevel = 36,
+    locale = "ja", uiMode = Configuration.UI_MODE_NIGHT_NO, showBackground = true)
+@Preview(name = "ダーク", group = "SELFIE・kawaii", widthDp = 393, heightDp = 800, apiLevel = 36,
+    locale = "ja", uiMode = Configuration.UI_MODE_NIGHT_YES, showBackground = true)
+@Composable
+fun SelfieKawaiiPreview(@PreviewParameter(SelfiePreviewProvider::class) state: SelfieUiState) {
+    SelfieTheme(skin = AppSkin.KAWAII) { SelfieScreen(state, onAction = {}) }
+}
+
+@Preview(name = "小画面・大きな文字・kawaii", group = "SELFIE・kawaii", widthDp = 320, heightDp = 480,
+    fontScale = 1.5f, apiLevel = 36, locale = "ja")
+@Composable
+fun SelfieKawaiiAccessiblePreview() {
+    SelfieKawaiiPreview(SelfiePreviewSamples.samples[3].state)
 }

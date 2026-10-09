@@ -2,6 +2,7 @@ package org.staacks.alpharemote
 
 import android.content.Context
 import org.staacks.alpharemote.selfie.SelfieSettings
+import org.staacks.alpharemote.ui.appearance.AppSkin
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.MutablePreferences
 import androidx.datastore.preferences.core.Preferences
@@ -26,6 +27,13 @@ val Context.settings: DataStore<Preferences> by preferencesDataStore(name = PREF
 
 class SettingsStore(context: Context) {
     private val settings = context.settings
+
+    private val skinKey = stringPreferencesKey("uiSkin")
+    val skin: Flow<AppSkin> = settings.data.map { AppSkin.fromStorage(it[skinKey]) }.distinctUntilChanged()
+
+    suspend fun setSkin(skin: AppSkin) {
+        settings.edit { it[skinKey] = skin.storageId }
+    }
 
     private val selfieCountdownKey = intPreferencesKey("selfieCountdown")
     private val selfieHoldKey = intPreferencesKey("selfieHold")

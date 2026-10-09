@@ -11,7 +11,9 @@ import androidx.navigation.NavController
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.navOptions
 import org.staacks.alpharemote.ui.components.SelfieNavigationBar
-import org.staacks.alpharemote.ui.selfie.SelfieTheme
+import org.staacks.alpharemote.ui.appearance.AppearanceViewModel
+import org.staacks.alpharemote.ui.appearance.RuntimeSelfieTheme
+import androidx.lifecycle.ViewModelProvider
 import org.staacks.alpharemote.databinding.ActivityMainBinding
 
 class MainActivity : AppCompatActivity() {
@@ -39,8 +41,9 @@ class MainActivity : AppCompatActivity() {
         val navController = findNavController(R.id.nav_host_fragment_activity_main)
         navController.addOnDestinationChangedListener(destinationListener)
         binding.navView.setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+        val appearance = ViewModelProvider(this)[AppearanceViewModel::class.java]
         binding.navView.setContent {
-            SelfieTheme { SelfieNavigationBar(selectedPage.intValue, ::navigateTo) }
+            RuntimeSelfieTheme(appearance) { SelfieNavigationBar(selectedPage.intValue, ::navigateTo) }
         }
 
         var startPage = intent?.getIntExtra(NAVIGATE_TO_INTENT_EXTRA, R.id.navigation_selfie) ?: R.id.navigation_selfie

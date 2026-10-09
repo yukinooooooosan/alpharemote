@@ -29,8 +29,9 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import org.staacks.alpharemote.ui.selfie.SelfieTheme
 import androidx.fragment.app.Fragment
+import org.staacks.alpharemote.ui.appearance.AppearanceViewModel
+import org.staacks.alpharemote.ui.appearance.RuntimeSelfieTheme
 import androidx.lifecycle.ViewModelProvider
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import org.staacks.alpharemote.MainActivity
@@ -84,9 +85,10 @@ class SettingsFragment : Fragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        val appearance = ViewModelProvider(requireActivity())[AppearanceViewModel::class.java]
         (view as ComposeView).setContent {
             val state by settingsViewModel.uiState.collectAsStateWithLifecycle()
-            SelfieTheme { ConnectionScreen(state, ::handleAction) }
+            RuntimeSelfieTheme(appearance) { ConnectionScreen(state, ::handleAction) }
         }
     }
 
