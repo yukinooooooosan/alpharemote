@@ -24,6 +24,7 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
@@ -205,7 +206,6 @@ private fun Osd(text: String, modifier: Modifier) {
 private fun PhaseContent(state: SelfieUiState, scale: Float) {
     val session = state.session
     val settings = state.settings
-    val loop = rememberInfiniteTransition(label = "finder")
     when (session.phase) {
         SelfiePhase.IDLE -> {
             BigText(pad(settings.countdownSeconds), dpSp(120.dp * (scale / 0.55f).coerceAtMost(1f)))
@@ -225,7 +225,8 @@ private fun PhaseContent(state: SelfieUiState, scale: Float) {
             Hint(stringResource(if (session.attempts == 0) R.string.finder_hint_first else R.string.finder_hint_next))
         }
         SelfiePhase.FOCUSING -> {
-            val pulse by loop.animateFloat(1.25f, 0.92f, infiniteRepeatable(tween(350), RepeatMode.Reverse), label = "af")
+            // Endless animations exist only while their phase is on screen (see loopingFloat).
+            val pulse by loopingFloat(1.25f, 0.92f, 350, "af")
             Box(Modifier.padding(bottom = 18.dp).size(110.dp * scale.coerceAtLeast(0.6f)).graphicsLayer { scaleX = pulse; scaleY = pulse }
                 .border(BorderStroke(3.dp, Finder.Green), RoundedCornerShape(6.dp)), contentAlignment = Alignment.Center) {
                 Text(stringResource(R.string.finder_af), color = Finder.Green, fontFamily = Finder.Mono, fontWeight = FontWeight.SemiBold, fontSize = 22.sp)
@@ -235,7 +236,7 @@ private fun PhaseContent(state: SelfieUiState, scale: Float) {
             Hint(stringResource(R.string.selfie_focus_hint))
         }
         SelfiePhase.SHOOTING -> {
-            val blink by loop.animateFloat(1f, 0.15f, infiniteRepeatable(tween(250), RepeatMode.Reverse), label = "rec")
+            val blink by loopingFloat(1f, 0.15f, 250, "rec")
             Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                 Box(Modifier.size(20.dp).graphicsLayer { alpha = blink }.background(Finder.Red, CircleShape))
                 BigText(stringResource(R.string.finder_shot), dpSp(84.dp * scale.coerceAtLeast(0.7f)), weight = FontWeight.Bold, letterSpacing = 4.sp)
@@ -263,6 +264,11 @@ private fun PhaseContent(state: SelfieUiState, scale: Float) {
         }
     }
 }
+
+/** A back-and-forth value for blinking. Call it only inside the phase that needs it, never for the whole screen. */
+@Composable
+private fun loopingFloat(from: Float, to: Float, millis: Int, label: String): State<Float> =
+    rememberInfiniteTransition(label = label).animateFloat(from, to, infiniteRepeatable(tween(millis), RepeatMode.Reverse), label = label)
 
 @Composable
 private fun BigText(text: String, size: TextUnit, modifier: Modifier = Modifier, color: Color = Finder.Ink,
@@ -322,8 +328,9 @@ private fun FlowBar(state: SelfieUiState) {
             shot.animateTo(1f, tween(settings.holdMillis, easing = LinearEasing))
         }
     }
-    val glow by rememberInfiniteTransition(label = "flow").animateFloat(1f, 0.45f,
-        infiniteRepeatable(tween(300), RepeatMode.Reverse), label = "af_glow")
+    // Only FOCUSING blinks. An endless animation in idle would keep the main looper busy forever
+    // (Robolectric's Activity setup never settles) and wastes frames on a phone left standing.
+    val glow: State<Float>? = if (phase == SelfiePhase.FOCUSING) loopingFloat(1f, 0.45f, 300, "af_glow") else null
     val failed = phase == SelfiePhase.ERROR && !session.disconnected
     val stage = when (phase) {
         SelfiePhase.COUNTDOWN -> 0
@@ -346,7 +353,7 @@ private fun FlowBar(state: SelfieUiState) {
         FlowArrow()
         FlowCell(if (failed) stringResource(R.string.finder_af_fail) else stringResource(R.string.finder_flow_af),
             if (failed) Finder.Fail else Finder.Green, 1f,
-            active = running && stage == 1, done = done(1), progress = { if (failed) 1f else glow })
+            active = running && stage == 1, done = done(1), progress = { if (failed) 1f else glow?.value ?: 1f })
         FlowArrow()
         FlowCell(stringResource(R.string.finder_flow_shot, holdLabel), Finder.Red, 1.3f,
             active = running && stage == 2, done = done(2), progress = { shot.value })
