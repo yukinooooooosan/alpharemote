@@ -57,6 +57,7 @@ import androidx.compose.ui.res.stringArrayResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.clearAndSetSemantics
+import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
@@ -66,6 +67,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.zIndex
 import org.staacks.alpharemote.R
 import org.staacks.alpharemote.selfie.SelfiePhase
 import org.staacks.alpharemote.selfie.SelfieSettings
@@ -198,8 +200,9 @@ private fun SceneContent(scene: KawaiiScene, state: SelfieUiState, show: SelfieS
 @Composable
 private fun IdleScene(connected: Boolean, loop: InfiniteTransition) {
     val bob = rememberBob(loop)
-    Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(16.dp)) {
-        StickerText(stringResource(R.string.kawaii_title), dpSp(58.dp), Kawaii.Pink, tag = "kawaii_headline", stroke = 13.dp,
+    Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(14.dp)) {
+        KawaiiLogo(loop, Modifier.padding(bottom = 16.dp))
+        StickerText(stringResource(R.string.kawaii_title), dpSp(52.dp), Kawaii.Pink, tag = "kawaii_headline", stroke = 11.dp,
             modifier = Modifier.graphicsLayer { translationY = bob.value * 8.dp.toPx(); rotationZ = bob.value * -4f })
         Pill(stringResource(if (connected) R.string.kawaii_place_phone else R.string.kawaii_connect_first))
         Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
@@ -394,12 +397,38 @@ private fun MessageScene(title: String, body: String, color: Color) {
 @Composable
 private fun rememberBob(loop: InfiniteTransition): State<Float> = loop.wave("bob", -1f, 1f, 1200)
 
+/** App logo (kawaii): "Selfie Remote" sticker text with a separate balloon S tucked underneath. */
+@Composable
+private fun KawaiiLogo(loop: InfiniteTransition, modifier: Modifier = Modifier) {
+    val spin = animateFloatLoop(loop, "logo_spin", 0f, 360f, 5000, RepeatMode.Restart, LinearEasing)
+    val twinkle = loop.wave("logo_twinkle", 0.55f, 1.15f, 650)
+    Row(modifier.graphicsLayer { rotationZ = -3f }.clearAndSetSemantics { contentDescription = "Selfie Remote S" },
+        verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy((-46).dp)) {
+        Box(Modifier.zIndex(2f)) {
+            Canvas(Modifier.offset(x = (-22).dp, y = (-6).dp).size(22.dp)) {
+                star(center, size.width / 2 * twinkle.value, Color.White)
+            }
+            StickerText("Selfie\nRemote", dpSp(42.dp), Kawaii.Plum, stroke = 10.dp, shadow = null, lineHeight = 1.05f, align = TextAlign.Start)
+        }
+        Box(Modifier.zIndex(1f).graphicsLayer { rotationZ = 10f }) {
+            StickerText("S", dpSp(145.dp), Kawaii.Pink, stroke = 15.dp, lineHeight = 0.95f)
+            Box(Modifier.offset(x = 43.dp, y = 31.dp).size(24.dp, 9.dp).graphicsLayer { rotationZ = -32f }
+                .background(Color.White.copy(alpha = .9f), RoundedCornerShape(50)))
+            Box(Modifier.offset(x = 36.dp, y = 45.dp).size(7.dp).background(Color.White.copy(alpha = .9f), CircleShape))
+            Canvas(Modifier.align(Alignment.TopEnd).offset(x = 18.dp, y = (-4).dp).size(34.dp).graphicsLayer { rotationZ = spin.value }) {
+                star(center, size.width / 2, Kawaii.Yellow)
+            }
+        }
+    }
+}
+
 /** Purikura sticker lettering: a white outline with a drop shadow behind the fill. */
 @Composable
 private fun StickerText(text: String, size: TextUnit, color: Color, modifier: Modifier = Modifier, tag: String? = null,
-                        stroke: Dp = 10.dp, shadow: Color? = Kawaii.DeepPlum, lineHeight: Float = 1.1f) {
+                        stroke: Dp = 10.dp, shadow: Color? = Kawaii.DeepPlum, lineHeight: Float = 1.1f,
+                        align: TextAlign = TextAlign.Center) {
     val strokePx = with(LocalDensity.current) { stroke.toPx() }
-    val style = TextStyle(fontFamily = Kawaii.Pop, fontSize = size, lineHeight = size * lineHeight, textAlign = TextAlign.Center)
+    val style = TextStyle(fontFamily = Kawaii.Pop, fontSize = size, lineHeight = size * lineHeight, textAlign = align)
     Box(modifier, contentAlignment = Alignment.Center) {
         Text(text, Modifier.clearAndSetSemantics {}, style = style.copy(color = Color.White,
             drawStyle = Stroke(width = strokePx, join = StrokeJoin.Round),
