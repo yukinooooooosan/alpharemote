@@ -17,7 +17,7 @@ class SelfieAudio {
         when (sound) {
             SelfieSound.TICK -> tone?.startTone(ToneGenerator.TONE_PROP_BEEP, 100)
             SelfieSound.LAST_SECOND -> tone?.startTone(ToneGenerator.TONE_PROP_BEEP2, 200)
-            SelfieSound.AF_ERROR -> tone?.startTone(ToneGenerator.TONE_PROP_NACK, 300)
+            SelfieSound.AF_ERROR, SelfieSound.DISCONNECTED -> tone?.startTone(ToneGenerator.TONE_PROP_NACK, 300)
             SelfieSound.FINISHED -> tone?.startTone(ToneGenerator.TONE_PROP_ACK, 700)
         }
     }

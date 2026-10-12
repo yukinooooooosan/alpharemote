@@ -59,11 +59,24 @@ AFタイムアウトはシャッターを解除して、エラー音を鳴らし
 - スキンは撮影設定と別のDataStoreキーに保存し、4画面と下部タブへ反映する。通常／ダークは端末の設定に合わせる。撮影中の状態やカメラ設定には影響しない。
 - 両スキンの共通の色と文字は `ui/selfie/SelfieTheme.kt`、余白・角丸・選択UIは `ui/components/SelfieComponents.kt` で定義する。
 - SELFIEの状態Previewは `SelfiePreviews.kt`、他の3画面は `ui/components/AppPreviews.kt` をAndroid StudioのSplit / Designで開く（PreviewはAPI 36）。
-- SELFIEは両スキン×通常／ダーク×12状態の48通りと小画面・大きな文字の2通り。SELFIEのPreviewは未接続・待機・カウント・AF・撮影・AF失敗・終了・停止・切断・復元待ち・無限撮影・スキップあり終了を含む。小画面／大きな文字のPreviewも用意する。
-- 自動テストではAPI 36のNative Graphicsで両スキン×通常／ダークの28枚のCompose画面画像を `app/build/outputs/ui-previews/` に生成する。画像はGit管理対象外で、実機画面やMacのIDE Previewと区別する。
+- SimpleのSELFIEは通常／ダーク×12状態と小画面・大きな文字。kawaiiのSELFIEは `KawaiiPreviews.kt` の10状態と小画面・大きな文字。
+- 自動テストではAPI 36のNative Graphicsで両スキン×通常／ダーク×9画面の36枚のCompose画面画像を `app/build/outputs/ui-previews/` に生成する。画像はGit管理対象外で、実機画面やMacのIDE Previewと区別する。
 - 各Previewは表示用サンプルと空のイベント処理を使う。実カメラ操作・ペアリング・Service・保存は実行しない。取説の折りたたみのみローカルに操作できる。
 - カウントは「AF開始まで」、進捗は「試行」と表示する。撮影中のSTOPは設定や状態のスクロール領域の外に置く。
 - 画面ホストのXML、システムのペアリング画面、既存の確認ダイアログと通知RemoteViewsは維持する。
+
+## kawaiiモード（SELFIE画面）
+
+kawaiiスキンのSELFIEは、プリクラ風の演出をする別画面 `ui/selfie/KawaiiSelfieScreen.kt` に切り替わる。普段使いはSimple、kawaiiは遊ぶためのモードと割り切り、使いやすさより演出を優先する。
+
+- スマホはカメラの横に置き、画面を自分のほうへ向ける前提。2〜3m先から読めるよう、主な文字は端末の文字サイズに左右されないdp基準の大きさにする。
+- 撮影は固定（`SelfieSettings.KAWAII`）：1枚撮り（全押し100ms）・5回・初回10秒／以降5秒・AF失敗も1回に数える。Simpleで保存した設定は変更しない。
+- 画面：カウントの数字がはずむ、ポーズ指示の吹き出し、ピント中の枠、撮影時の白フラッシュと「ぱしゃっ♡」スタンプ＋褒め言葉、AF失敗の「あれれ？」、終了の紙吹雪、進み具合のハート5個。通常／ダークに関係なく明るい配色。
+- STOPは撮影中は常に表示し、白地に濃い紫の太枠で一番強いコントラストにする。撮影中はカメラ接続への移動を無効にする。
+- ポーズ（32種）と褒め言葉（20種）の抽選、音声の合図はService側の `selfie/SelfieShow.kt` が行い、`AlphaRemoteService.selfieShowState` で画面へ配る。画面と声は同じIDを使う。撮影制御の状態を見るだけで、撮影タイミングは変えない。
+- 音声は `selfie/SelfieVoice.kt` が `res/raw/kw_*.ogg` を1チャンネルで再生する。音声ファイルが無い間は何も鳴らさず、従来の電子音が鳴る。台本・タイミング・再生ルールは [KAWAII-VOICE-SCRIPT.md](KAWAII-VOICE-SCRIPT.md)。
+- 表示はシャッター操作の回数（「5かい中 4かい パシャッ！」）で、保存された写真の枚数とは言わない。
+- 見出しの書体は Mochiy Pop One（SIL OFL 1.1）。kawaiiの文言で使う文字だけに絞った約100KBのサブセットを `res/font/mochiy_pop_one.ttf` に同梱し、ライセンスは `assets/licenses/MochiyPopOne-OFL.txt`。文言に新しい漢字を足したら `tools/subset_kawaii_font.py` で作り直す（未収録の文字は端末の書体で表示される）。
 
 ## ビルド
 

@@ -4,7 +4,7 @@ import org.staacks.alpharemote.camera.CameraActionPreset
 import org.staacks.alpharemote.camera.CameraActionStep
 
 enum class SelfiePhase { IDLE, COUNTDOWN, FOCUSING, SHOOTING, ERROR, COMPLETED, STOPPED }
-enum class SelfieSound { TICK, LAST_SECOND, AF_ERROR, FINISHED }
+enum class SelfieSound { TICK, LAST_SECOND, AF_ERROR, FINISHED, DISCONNECTED }
 
 data class SelfieState(
     val phase: SelfiePhase = SelfiePhase.IDLE,
@@ -51,7 +51,7 @@ class SelfieController(private val port: Port, private val lock: Any = Any()) {
         state = SelfieState(phase = SelfiePhase.COUNTDOWN, targetCycles = options.cycles)
         port.releaseAll()
         port.awake(true)
-        countdown(options.countdownSeconds)
+        countdown(options.firstCountdown)
         true
     }
 
@@ -86,7 +86,7 @@ class SelfieController(private val port: Port, private val lock: Any = Any()) {
         invalidateTimer()
         port.releaseAll()
         port.awake(false)
-        port.sound(SelfieSound.AF_ERROR)
+        port.sound(SelfieSound.DISCONNECTED)
         publish(state.copy(phase = SelfiePhase.ERROR, remainingSeconds = 0, disconnected = true))
     }
 

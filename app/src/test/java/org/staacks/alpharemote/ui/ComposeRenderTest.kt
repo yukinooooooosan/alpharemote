@@ -18,6 +18,8 @@ import org.staacks.alpharemote.ui.about.AboutScreen
 import org.staacks.alpharemote.ui.appearance.AppSkin
 import org.staacks.alpharemote.ui.components.ConnectionPreviewSamples
 import org.staacks.alpharemote.ui.manual.ManualScreen
+import org.staacks.alpharemote.ui.selfie.KawaiiPreviewSamples
+import org.staacks.alpharemote.ui.selfie.KawaiiSelfieScreen
 import org.staacks.alpharemote.ui.selfie.SelfiePreviewSamples
 import org.staacks.alpharemote.ui.selfie.SelfieScreen
 import org.staacks.alpharemote.ui.selfie.SelfieTheme
@@ -38,6 +40,7 @@ class ComposeRenderTest {
         val dark = mutableStateOf(false)
         val skin = mutableStateOf(AppSkin.SIMPLE)
         val sample = mutableStateOf(SelfiePreviewSamples.samples[1].state)
+        val kawaii = mutableStateOf(KawaiiPreviewSamples.samples[1])
         compose.setContent {
             SelfieTheme(dark.value, skin.value) {
                 // Each capture starts at the top, as in a fresh IDE preview.
@@ -46,7 +49,8 @@ class ComposeRenderTest {
                         "manual" -> ManualScreen()
                         "about" -> AboutScreen("0.1.6", 7, {}, {}, skin = skin.value)
                         "connection" -> ConnectionScreen(ConnectionPreviewSamples.ready, {})
-                        else -> SelfieScreen(sample.value, {})
+                        else -> if (skin.value == AppSkin.KAWAII) KawaiiSelfieScreen(kawaii.value.state, kawaii.value.show, {})
+                            else SelfieScreen(sample.value, {})
                     }
                 }
             }
@@ -54,14 +58,17 @@ class ComposeRenderTest {
         val directory = File("build/outputs/ui-previews").apply { mkdirs() }
         AppSkin.entries.forEach { style ->
             listOf(false, true).forEach { mode ->
-                listOf("selfie", "connection", "manual", "about", "countdown", "focusing", "shooting").forEach { name ->
+                listOf("selfie", "connection", "manual", "about", "countdown", "focusing", "shooting", "fail", "done").forEach { name ->
                     compose.runOnIdle {
                         dark.value = mode
                         skin.value = style
                         page.value = name
                         sample.value = SelfiePreviewSamples.samples[when (name) {
-                            "countdown" -> 2; "focusing" -> 3; "shooting" -> 4; else -> 1
+                            "countdown" -> 2; "focusing" -> 3; "shooting" -> 4; "fail" -> 5; "done" -> 6; else -> 1
                         }].state
+                        kawaii.value = KawaiiPreviewSamples.samples[when (name) {
+                            "countdown" -> 3; "focusing" -> 4; "shooting" -> 5; "fail" -> 6; "done" -> 7; else -> 1
+                        }]
                     }
                     val bitmap = compose.onRoot().captureToImage().asAndroidBitmap()
                     assertTrue(bitmap.width > 0 && bitmap.height > 0)

@@ -74,6 +74,32 @@ class SelfieControllerTest {
             port.commands.takeLast(2).map { it.second })
     }
 
+    @Test fun firstCountdownOnlyAppliesToTheFirstCycle() {
+        val port = FakePort()
+        val controller = SelfieController(port)
+        controller.start(SelfieSettings(countdownSeconds = 3, holdMillis = 100, cycles = 5, firstCountdownSeconds = 10))
+        assertEquals(10, controller.state.remainingSeconds)
+        port.advance(9999)
+        assertEquals(SelfiePhase.COUNTDOWN, controller.state.phase)
+        port.advance(1)
+        assertEquals(SelfiePhase.FOCUSING, controller.state.phase)
+        controller.onFocusReport(true, port.now)
+        port.advance(100)
+        assertEquals(3, controller.state.remainingSeconds)
+        port.advance(3000)
+        assertEquals(SelfiePhase.FOCUSING, controller.state.phase)
+        assertEquals(listOf(10000L, 13100L), port.presses(ButtonCode.SHUTTER_HALF).map { it.first })
+    }
+
+    @Test fun disconnectUsesItsOwnSound() {
+        val port = FakePort()
+        val controller = SelfieController(port)
+        controller.start(SelfieSettings(countdownSound = false))
+        port.online = false
+        controller.disconnected()
+        assertEquals(listOf(SelfieSound.DISCONNECTED), port.sounds)
+    }
+
     @Test fun focusTimeoutSkipsAndCountsAsAnAttemptEvenWhenCountdownSoundIsOff() {
         val port = FakePort()
         val controller = SelfieController(port)

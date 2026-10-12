@@ -155,3 +155,17 @@ versionCodeは7、versionNameは0.1.6。
 - 撮影中に「撮影操作 n回 · スキップ n回」を表示。待機中は「撮影 1秒 · 回数 5回」の設定要約を表示。
 - 通知の進行表示を画面と同じ「試行 n / m · 撮影操作 · スキップ」にそろえた（従来は完了済み回数で、画面と1ずれていた）。
 - `SelfieScreenTest` の期待文言を更新し、`running_counts` と `settings_summary` の確認を追加した。
+
+## 未ビルド：kawaiiモードのSELFIE画面と音声の土台
+
+前の「SELFIE画面の視認性の調整」はN100で67件のテスト・APKビルド成功、lintエラー0件を確認済み（ユーザー報告）。
+今回の変更はクラウド環境で作成した。Android SDKとGoogle Mavenに接続できないため、Android・Compose部分はコンパイルしていない。N100で `testDebugUnitTest assembleDebug lintDebug` を通してから版番号を上げる。
+
+- 純Kotlinの撮影制御と演出ロジックは、Kotlin 2.2コンパイラとJUnit 4で単体テストを実行した（`SelfieControllerTest` 10件・`SelfieShowTest` 4件、すべて成功。カメラ操作の定義は最小限の代用を使用）。
+- `SelfieSettings` に初回だけの待機秒数と `show` を追加。`SelfieSettings.KAWAII`（1枚撮り・5回・初回10秒／以降5秒）。保存形式は変更なし。
+- 切断時の音を `SelfieSound.DISCONNECTED` に分けた（音色は従来のAF失敗音と同じ）。
+- `SelfieShow`：ポーズ・褒め言葉の抽選と音声の合図。撮影制御が公開する状態だけを見て、タイミングを変えない。
+- `SelfieVoice`：`res/raw/kw_*` を1チャンネル・割り込み／待ちのルールで再生。音声ファイルはまだ無いため、現状は何も鳴らず、従来の電子音が鳴る。
+- `KawaiiSelfieScreen`：モックを移植したプリクラ風画面。kawaiiスキンのときだけSELFIEタブで使う。
+- テスト追加：`SelfieShowTest`、`KawaiiSelfieScreenTest`（Robolectric）。`ComposeRenderTest` にkawaii画面とAF失敗・終了を追加。
+- 実機未確認：アニメーションの見え方、2〜3m先からの読みやすさ、小画面での中央部のはみ出し。

@@ -8,6 +8,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.fragment.app.Fragment
+import org.staacks.alpharemote.ui.appearance.AppSkin
 import org.staacks.alpharemote.ui.appearance.AppearanceViewModel
 import org.staacks.alpharemote.ui.appearance.RuntimeSelfieTheme
 import androidx.lifecycle.ViewModelProvider
@@ -35,28 +36,34 @@ class SelfieFragment : Fragment() {
             val settings by viewModel.settings.collectAsStateWithLifecycle()
             val session by AlphaRemoteService.selfieState.collectAsStateWithLifecycle()
             val service by AlphaRemoteService.serviceState.collectAsStateWithLifecycle()
+            val show by AlphaRemoteService.selfieShowState.collectAsStateWithLifecycle()
+            val skin by appearance.skin.collectAsStateWithLifecycle()
             RuntimeSelfieTheme(appearance) {
-                SelfieScreen(
-                    state = SelfieUiState(
-                        settings = settings ?: SelfieSettings(),
-                        settingsLoaded = settings != null,
-                        connected = (service as? ServiceRunning)?.cameraState is CameraStateReady,
-                        session = session,
-                    ),
-                    onAction = { handleAction(it, viewModel) },
+                val state = SelfieUiState(
+                    settings = settings ?: SelfieSettings(),
+                    settingsLoaded = settings != null,
+                    connected = (service as? ServiceRunning)?.cameraState is CameraStateReady,
+                    session = session,
                 )
+                // kawaii is a separate show screen with fixed settings; Simple keeps the configurable screen.
+                if (skin == AppSkin.KAWAII) {
+                    KawaiiSelfieScreen(state, show, onAction = { handleAction(it, viewModel, appearance) })
+                } else {
+                    SelfieScreen(state, onAction = { handleAction(it, viewModel, appearance) })
+                }
             }
         }
     }
 
-    private fun handleAction(action: SelfieUiAction, viewModel: SelfieViewModel) {
+    private fun handleAction(action: SelfieUiAction, viewModel: SelfieViewModel, appearance: AppearanceViewModel) {
         when (action) {
             SelfieUiAction.OpenConnection -> (requireActivity() as MainActivity).navigateTo(R.id.navigation_settings)
             SelfieUiAction.StartStop -> {
                 if (AlphaRemoteService.selfieState.value.running) {
                     AlphaRemoteService.stopSelfie(requireContext())
                 } else {
-                    val settings = viewModel.settings.value ?: return
+                    val settings = if (appearance.skin.value == AppSkin.KAWAII) SelfieSettings.KAWAII
+                        else viewModel.settings.value ?: return
                     if (!AlphaRemoteService.startSelfie(requireContext(), settings)) {
                         MaterialAlertDialogBuilder(requireContext())
                             .setMessage(R.string.selfie_connection_hint)

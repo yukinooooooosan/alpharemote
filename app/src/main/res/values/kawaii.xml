@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- kawaii mode copy. Intentionally Japanese purikura style in every locale. Ids match docs/KAWAII-VOICE-SCRIPT.md:
+     kawaii_poses[i] is kw_pose_(i+1), kawaii_praises[i] is kw_praise_(i+1). Never reorder; append only. -->
+<resources>
+    <string name="kawaii_ribbon" translatable="false">SMILE ♡ SELFIE ♡ POSE ♡ SMILE ♡ SELFIE ♡ POSE ♡ </string>
+    <string name="kawaii_camera_ok" translatable="false">カメラOK</string>
+    <string name="kawaii_camera_missing" translatable="false">カメラまだ</string>
+    <string name="kawaii_open_connection" translatable="false">カメラ接続を開く</string>
+    <string name="kawaii_title" translatable="false">とるよ〜！</string>
+    <string name="kawaii_place_phone" translatable="false">スマホをこっちに向けて置いてね</string>
+    <string name="kawaii_connect_first" translatable="false">まずはカメラをつないでね</string>
+    <string name="kawaii_chip_count" translatable="false">5かい撮るよ</string>
+    <string name="kawaii_chip_single" translatable="false">1まいずつ</string>
+    <string name="kawaii_chip_first" translatable="false">さいしょは10びょう</string>
+    <string name="kawaii_check_single" translatable="false">カメラは「1枚撮り」にしてね</string>
+    <string name="kawaii_check_single_sub" translatable="false">連写だと何枚も撮れちゃうよ</string>
+    <string name="kawaii_start" translatable="false">スタート</string>
+    <string name="kawaii_again" translatable="false">もう1回！</string>
+    <string name="kawaii_stop" translatable="false">ストップ</string>
+    <string name="kawaii_counter" translatable="false">%1$d / %2$dかいめ</string>
+    <string name="kawaii_counter_infinite" translatable="false">%1$dかいめ</string>
+    <string name="kawaii_pose_lead_first" translatable="false">さいしょのポーズは…</string>
+    <string name="kawaii_pose_lead" translatable="false">つぎのポーズは…</string>
+    <string name="kawaii_caption_first" translatable="false">スマホからはなれて、位置についてね</string>
+    <string name="kawaii_caption" translatable="false">0になったら、ピント合わせるよ</string>
+    <string name="kawaii_focusing" translatable="false">ピント\n合わせ中…</string>
+    <string name="kawaii_hold_still" translatable="false">うごかないで〜！</string>
+    <string name="kawaii_shutter" translatable="false">ぱしゃっ</string>
+    <string name="kawaii_fail" translatable="false">あれれ？</string>
+    <string name="kawaii_fail_sub" translatable="false">ピント合わなかった…</string>
+    <string name="kawaii_fail_skip" translatable="false">この回はスキップ！\nつぎいこ〜</string>
+    <string name="kawaii_done" translatable="false">おつかれ\nさま〜！</string>
+    <string name="kawaii_done_result" translatable="false">%1$dかい中 %2$dかい パシャッ！</string>
+    <string name="kawaii_done_skips" translatable="false">ピント合わずスキップ %1$dかい</string>
+    <string name="kawaii_stopped" translatable="false">ストップ\nしたよ</string>
+    <string name="kawaii_stopped_sub" translatable="false">また撮ろうね</string>
+    <string name="kawaii_disconnected" translatable="false">あれ、\nカメラが…</string>
+    <string-array name="kawaii_poses" translatable="false">
+        <item>ピース！</item>
+        <item>ダブルピース！</item>
+        <item>ハート作って！</item>
+        <item>指ハート！</item>
+        <item>両手でハート！</item>
+        <item>上目づかい！</item>
+        <item>ほっぺに手！</item>
+        <item>ほおづえ！</item>
+        <item>横顔いこ〜</item>
+        <item>振り返って！</item>
+        <item>ねこポーズ！</item>
+        <item>うさ耳！</item>
+        <item>ジャンプ！？</item>
+        <item>変顔チャンス！</item>
+        <item>キメ顔で！</item>
+        <item>ウインク！</item>
+        <item>投げキッス！</item>
+        <item>考える人！</item>
+        <item>びっくり顔！</item>
+        <item>ぷんぷん顔！</item>
+        <item>寝たふり！</item>
+        <item>空を見上げて！</item>
+        <item>手をふって〜</item>
+        <item>髪をふわっと！</item>
+        <item>手でフレーム！</item>
+        <item>グーであご！</item>
+        <item>しゃがんで！</item>
+        <item>背のびして！</item>
+        <item>くるっと回って！</item>
+        <item>おすまし顔！</item>
+        <item>大笑い！</item>
+        <item>ガッツポーズ！</item>
+    </string-array>
+    <string-array name="kawaii_praises" translatable="false">
+        <item>かわいい〜！</item>
+        <item>天才！</item>
+        <item>最高〜！</item>
+        <item>盛れてる！</item>
+        <item>いいね〜！</item>
+        <item>優勝！</item>
+        <item>映え〜！</item>
+        <item>好き！</item>
+        <item>奇跡の1枚！</item>
+        <item>アイドルかな？</item>
+        <item>モデルさん？</item>
+        <item>100点！</item>
+        <item>世界一！</item>
+        <item>尊い…！</item>
+        <item>きゅん！</item>
+        <item>ナイスポーズ！</item>
+        <item>神ってる！</item>
+        <item>完璧〜！</item>
+        <item>表紙いけるよ！</item>
+        <item>もう1枚いこ！</item>
+    </string-array>
+</resources>

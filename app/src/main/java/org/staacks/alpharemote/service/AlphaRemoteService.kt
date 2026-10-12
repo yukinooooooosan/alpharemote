@@ -35,6 +35,9 @@ import org.staacks.alpharemote.selfie.SelfieSettings
 import org.staacks.alpharemote.selfie.SelfieState
 import org.staacks.alpharemote.selfie.SelfieAudio
 import org.staacks.alpharemote.selfie.SelfieSound
+import org.staacks.alpharemote.selfie.SelfieShow
+import org.staacks.alpharemote.selfie.SelfieShowState
+import org.staacks.alpharemote.selfie.SelfieVoice
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -65,6 +68,9 @@ class AlphaRemoteService : CompanionDeviceService() {
     private val selfieHandler = Handler(Looper.getMainLooper())
     private lateinit var selfieController: SelfieController
     private var selfieAudio: SelfieAudio? = null
+    private var selfieVoice: SelfieVoice? = null
+    // kawaii show: picks poses/praise and voice cues from published states; never drives the camera.
+    private val selfieShow = SelfieShow { cue -> selfieVoice?.play(cue) }
     private var lastFocusReport: ReportedBoolean? = null
 
     private lateinit var pendingActionsWakeLock: PowerManager.WakeLock
@@ -79,6 +85,8 @@ class AlphaRemoteService : CompanionDeviceService() {
 
         private val _selfieState = MutableStateFlow(SelfieState())
         val selfieState: StateFlow<SelfieState> = _selfieState.asStateFlow()
+        private val _selfieShowState = MutableStateFlow(SelfieShowState())
+        val selfieShowState: StateFlow<SelfieShowState> = _selfieShowState.asStateFlow()
         const val SELFIE_START = "SELFIE_START"
         const val SELFIE_STOP = "SELFIE_STOP"
         const val SELFIE_SETTINGS = "selfie_settings"
@@ -153,14 +161,18 @@ class AlphaRemoteService : CompanionDeviceService() {
                 if (!enabled && pendingActionsWakeLock.isHeld) pendingActionsWakeLock.release()
             }
             override fun sound(sound: SelfieSound) {
+                // With a bundled voice pack the kawaii voice replaces the tones; the disconnect tone always stays.
+                if (sound != SelfieSound.DISCONNECTED && selfieShow.state.active && selfieVoice?.available == true) return
                 if (selfieAudio == null) selfieAudio = SelfieAudio()
                 selfieAudio?.play(sound)
             }
             override fun publish(state: SelfieState) {
+                _selfieShowState.value = selfieShow.onState(state)
                 _selfieState.value = state
                 notificationUI?.onSelfieStateUpdate(state)
             }
         }, this)
+        selfieVoice = SelfieVoice(this)
     }
 
     override fun onDeviceAppeared(address: String) {
@@ -290,6 +302,8 @@ class AlphaRemoteService : CompanionDeviceService() {
                     cancelPendingActionSteps()
                     // Mark cached focus before half-press; only subsequent reports can trigger capture.
                     lastFocusReport = (cameraBLE?.cameraState?.value as? CameraStateReady)?.focus
+                    selfieShow.prepare(options)
+                    _selfieShowState.value = selfieShow.state
                     selfieController.start(options)
                 }
             }
@@ -304,6 +318,8 @@ class AlphaRemoteService : CompanionDeviceService() {
         selfieHandler.removeCallbacksAndMessages(null)
         selfieAudio?.release()
         selfieAudio = null
+        selfieVoice?.release()
+        selfieVoice = null
         cameraBLE?.disconnectFromDevice()
         cameraBLE = null
         _serviceState.value = ServiceStateGone()
