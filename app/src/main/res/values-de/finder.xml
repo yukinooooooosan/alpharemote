@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="finder_camera_connected">Kamera verbunden</string>
+    <string name="finder_camera_offline">Kamera nicht verbunden</string>
+    <string name="finder_idle_hint">Nach START das Handy ablegen und Position einnehmen</string>
+    <string name="finder_hint_first">Handy ablegen und Position einnehmen</string>
+    <string name="finder_hint_next">Pose wechseln für das nächste Bild</string>
+    <string name="finder_focusing">Fokussiert</string>
+    <string name="finder_af_failed">Fokus fehlgeschlagen</string>
+    <string name="finder_done">%2$d von %1$d ausgelöst</string>
+    <string name="finder_done_skips">%1$d übersprungen</string>
+    <string name="finder_stopped">Nach %1$d Auslösungen gestoppt</string>
+    <string name="finder_flow">Ablauf</string>
+    <string name="finder_flow_wait">Warten %1$d s</string>
+    <string name="finder_flow_shot">Auslösen %1$s</string>
+</resources>

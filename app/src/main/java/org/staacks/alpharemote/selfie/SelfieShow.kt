@@ -21,7 +21,10 @@ sealed class SelfieCue(val clip: String, val interrupt: Boolean = false, val max
 
 enum class SelfieShotResult { SHOT, SKIPPED }
 
-/** What the kawaii screen shows besides the plain session. Ids are 1-based; 0 = none yet. */
+/**
+ * What the screens show besides the plain session. [results] is kept for every session (one entry per attempt);
+ * [active], poses, praise and voice cues only for the kawaii show. Ids are 1-based; 0 = none yet.
+ */
 data class SelfieShowState(
     val active: Boolean = false,
     val poseId: Int = 0,
@@ -40,12 +43,14 @@ class SelfieShow(private val random: Random = Random.Default, private val cue: (
     var state = SelfieShowState()
         private set
     private var settings: SelfieSettings? = null
+    private var show = false
     private var previous: SelfieState? = null
     private var poseOrder: List<Int> = emptyList()
 
-    /** Call before [SelfieController.start]; a non-show setting turns the show off. */
+    /** Call before [SelfieController.start]. Results are tracked for every session; the show only with [SelfieSettings.show]. */
     fun prepare(options: SelfieSettings) {
-        settings = options.takeIf { it.show }
+        settings = options
+        show = options.show
         previous = null
         poseOrder = emptyList()
         state = SelfieShowState()
@@ -58,36 +63,45 @@ class SelfieShow(private val random: Random = Random.Default, private val cue: (
         val entered = prev == null || prev.phase != session.phase
         when (session.phase) {
             SelfiePhase.COUNTDOWN -> countdown(options, prev, session, entered)
-            SelfiePhase.FOCUSING -> if (entered) cue(SelfieCue.Cheese)
-            SelfiePhase.SHOOTING -> if (entered) cue(SelfieCue.Shutter)
-            SelfiePhase.ERROR -> if (entered && !session.disconnected) cue(SelfieCue.AfFail)
+            SelfiePhase.FOCUSING -> if (entered) say(SelfieCue.Cheese)
+            SelfiePhase.SHOOTING -> if (entered) say(SelfieCue.Shutter)
+            SelfiePhase.ERROR -> if (entered && !session.disconnected) say(SelfieCue.AfFail)
             SelfiePhase.COMPLETED -> if (entered && prev != null) {
                 state = state.copy(results = state.results + result(prev, session))
-                cue(SelfieCue.Done)
-                cue(SelfieCue.Shots(session.shots.coerceIn(0, MAX_SHOTS_CUE)))
+                say(SelfieCue.Done)
+                say(SelfieCue.Shots(session.shots.coerceIn(0, MAX_SHOTS_CUE)))
             }
-            SelfiePhase.STOPPED -> if (entered) cue(SelfieCue.Stop)
+            SelfiePhase.STOPPED -> if (entered) say(SelfieCue.Stop)
             SelfiePhase.IDLE -> Unit
         }
         return state
+    }
+
+    private fun say(line: SelfieCue) {
+        if (show) cue(line)
     }
 
     private fun countdown(options: SelfieSettings, prev: SelfieState?, session: SelfieState, entered: Boolean) {
         if (poseOrder.isEmpty()) poseOrder = (1..POSE_COUNT).shuffled(random)
         if (session.attempts == 0 && (prev == null || !prev.running)) {
             poseOrder = (1..POSE_COUNT).shuffled(random)
-            state = SelfieShowState(active = true, poseId = poseOrder.first())
-            cue(SelfieCue.Intro)
+            state = if (show) SelfieShowState(active = true, poseId = poseOrder.first()) else SelfieShowState()
+            say(SelfieCue.Intro)
         } else if (entered && prev != null && session.attempts > prev.attempts) {
             val outcome = result(prev, session)
+            if (!show) {
+                state = state.copy(results = state.results + outcome)
+                return
+            }
             val finalRound = options.cycles != SelfieSettings.INFINITE && session.attempts == options.cycles - 1
             val praise = if (outcome == SelfieShotResult.SHOT) nextPraise() else state.praiseId
             state = state.copy(poseId = poseOrder[session.attempts % poseOrder.size], praiseId = praise,
                 results = state.results + outcome)
-            if (outcome == SelfieShotResult.SHOT) cue(if (finalRound) SelfieCue.Last else SelfieCue.Praise(praise))
+            if (outcome == SelfieShotResult.SHOT) say(if (finalRound) SelfieCue.Last else SelfieCue.Praise(praise))
         } else if (!entered && prev?.remainingSeconds == session.remainingSeconds) {
             return
         }
+        if (!show) return
         val total = if (session.attempts == 0) options.firstCountdown else options.countdownSeconds
         val elapsed = total - session.remainingSeconds
         if (session.attempts == 0 && total >= 7) {

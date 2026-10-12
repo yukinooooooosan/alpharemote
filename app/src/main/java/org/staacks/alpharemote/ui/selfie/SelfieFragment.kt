@@ -44,6 +44,7 @@ class SelfieFragment : Fragment() {
                     settingsLoaded = settings != null,
                     connected = (service as? ServiceRunning)?.cameraState is CameraStateReady,
                     session = session,
+                    results = show.results,
                 )
                 // kawaii is a separate show screen with fixed settings; Simple keeps the configurable screen.
                 if (skin == AppSkin.KAWAII) {

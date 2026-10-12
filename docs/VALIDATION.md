@@ -186,3 +186,13 @@ versionCodeは7、versionNameは0.1.6。
 - 音声ファイルは未収録。今回の検証は演出合図と画面表示を対象とし、実際のMediaPlayerによる音声再生・待ち列／割り込みは未検証。音声未収録のため現在のAPKでは従来の電子音を使う。
 
 **実機確認の現状：** Pixel 10 Proで5秒待機・5枚撮影はCompose移行前にユーザー確認済み。0.1.7の実機起動・撮影、画面OFF、通知STOP、2〜3mからの演出の見やすさ、Mac IDEのPreview操作は未検証。mainへはマージしない。
+
+## 未ビルド：Simpleモードのファインダー画面
+
+kawaiiモードの実装（`4bd0f36`）はN100でビルド成功（ユーザー報告）。今回はクラウド環境で作成し、Android・Compose部分は未コンパイル。
+
+- SimpleのSELFIEを、デザインキャンバスで選んだ「ファインダー案」に置き換えた。STARTからの「待機 › AF › 撮影」の流れを、設定した秒数・保持時間どおりに伸びるバーで表示する。
+- `SelfieShow` が全セッションで各回の結果を記録するように変更（声・ポーズ・褒め言葉はkawaiiのときだけ）。純Kotlinの `SelfieControllerTest` 10件・`SelfieShowTest` 4件をKotlin 2.2＋JUnit 4で実行し、すべて成功。
+- `SelfieScreenTest` を新しい画面に合わせて書き直した（12状態、接続の表示、設定イベント、復元待ち、切断、小画面・大きな文字でのSTOP、Previewのクリック）。
+- 書体 Barlow Condensed（SemiBold／Bold）と IBM Plex Mono（Medium／SemiBold）を同梱（計約500KB）。
+- 実機未確認：バーの伸びと実際の秒数のずれ、1枚撮り時の `SHOT` 表示の見え方、小画面での数字の縮み方。

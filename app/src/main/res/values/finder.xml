@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Simple mode viewfinder screen. OSD readouts are camera-style English and not translated. -->
+<resources>
+    <string name="finder_camera_connected">カメラ接続中</string>
+    <string name="finder_camera_offline">カメラ未接続</string>
+    <string name="finder_idle_hint">STARTのあと、スマホを置いて撮影位置へ</string>
+    <string name="finder_hint_first">スマホを置いて、撮影位置へ</string>
+    <string name="finder_hint_next">ポーズを変えて、次の1枚</string>
+    <string name="finder_focusing">ピント合わせ中</string>
+    <string name="finder_af_failed">ピントが合いませんでした</string>
+    <string name="finder_done">%1$d回中 %2$d回撮影</string>
+    <string name="finder_done_skips">%1$d回スキップ</string>
+    <string name="finder_stopped">%1$d回撮影したところで停止しました</string>
+    <string name="finder_flow">撮影の流れ</string>
+    <string name="finder_flow_wait">待機 %1$ds</string>
+    <string name="finder_flow_shot">撮影 %1$s</string>
+    <string name="finder_flow_af" translatable="false">AF</string>
+    <string name="finder_osd_delay" translatable="false">DELAY %1$ds</string>
+    <string name="finder_osd_cycles" translatable="false">×%1$s</string>
+    <string name="finder_osd_hold" translatable="false">SHOT %1$s</string>
+    <string name="finder_osd_single" translatable="false">SINGLE</string>
+    <string name="finder_osd_sound_on" translatable="false">SND ON</string>
+    <string name="finder_osd_sound_off" translatable="false">SND OFF</string>
+    <string name="finder_osd_try" translatable="false">TRY %1$d/%2$s</string>
+    <string name="finder_osd_skip" translatable="false">SKIP %1$d</string>
+    <string name="finder_osd_shots" translatable="false">SHOT %1$d</string>
+    <string name="finder_osd_wait" translatable="false">WAIT</string>
+    <string name="finder_af" translatable="false">AF</string>
+    <string name="finder_shot" translatable="false">SHOT</string>
+    <string name="finder_af_fail" translatable="false">AF ×</string>
+    <string name="finder_offline" translatable="false">OFFLINE</string>
+    <string name="finder_complete" translatable="false">COMPLETE</string>
+    <string name="finder_stop_title" translatable="false">STOP</string>
+    <string name="finder_sound_on" translatable="false">ON</string>
+    <string name="finder_sound_off" translatable="false">OFF</string>
+</resources>

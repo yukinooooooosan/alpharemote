@@ -4,9 +4,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsEnabled
 import androidx.compose.ui.test.assertIsNotEnabled
-import androidx.compose.ui.test.assertIsSelected
 import androidx.compose.ui.test.assertIsNotSelected
-import androidx.compose.ui.test.assertIsOn
+import androidx.compose.ui.test.assertIsSelected
 import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
@@ -25,7 +24,6 @@ import org.staacks.alpharemote.selfie.SelfiePhase
 import org.staacks.alpharemote.selfie.SelfieSettings
 import org.staacks.alpharemote.selfie.SelfieState
 import org.staacks.alpharemote.service.AlphaRemoteService
-import org.staacks.alpharemote.ui.appearance.AppSkin
 
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [31, 36], qualifiers = "ja-w393dp-h800dp")
@@ -37,37 +35,35 @@ class SelfieScreenTest {
 
     private fun checkSamples(dark: Boolean) {
         val state = mutableStateOf(SelfieUiState())
-        val skin = mutableStateOf(AppSkin.SIMPLE)
-        compose.setContent { SelfieTheme(dark, skin.value) { SelfieScreen(state.value, onAction = {}) } }
-        val expectedPhases = listOf("5秒", "5秒", "3", "AF中", "撮影中", "AF失敗", "撮影終了", "停止", "切断", "5秒", "5", "撮影終了")
-        AppSkin.entries.forEach { style ->
-            SelfiePreviewSamples.samples.forEachIndexed { index, sample ->
-                compose.runOnIdle { state.value = sample.state; skin.value = style }
-                compose.onNodeWithTag("phase_display").assertIsDisplayed().assertTextEquals(expectedPhases[index])
-                compose.onNodeWithTag("connection_status")
-                    .assertTextEquals(if (sample.state.connected) "● 接続済み" else "○ カメラ未接続")
-                compose.onNodeWithTag("start_stop").assertIsDisplayed()
-                    .assertTextEquals(if (sample.state.session.running) "STOP" else "START")
-                if (sample.state.session.running) {
-                    compose.onNodeWithTag("options").assertDoesNotExist()
-                    compose.onNodeWithTag("camera_settings").assertDoesNotExist()
-                    compose.onNodeWithTag("progress").assertTextEquals("試行 ${sample.state.session.attempts + 1} / ${if (sample.state.session.targetCycles == 0) "∞" else sample.state.session.targetCycles}")
-                    compose.onNodeWithTag("running_counts")
-                        .assertTextEquals("撮影操作 ${sample.state.session.shots}回 · スキップ ${sample.state.session.skipped}回")
-                } else {
-                    compose.onNodeWithTag("running_counts").assertDoesNotExist()
-                    compose.onNodeWithTag("options").assertExists()
-                    compose.onNodeWithTag("camera_settings").assertExists()
-                }
-                if (sample.state.session.phase == SelfiePhase.IDLE) {
-                    compose.onNodeWithTag("settings_summary").assertTextEquals("撮影 1秒 · 回数 5回")
-                } else {
-                    compose.onNodeWithTag("settings_summary").assertDoesNotExist()
-                }
+        compose.setContent { SelfieTheme(dark) { SelfieScreen(state.value, onAction = {}) } }
+        val expectedPhases = listOf("05", "05", "03", "ピント合わせ中", "SHOT", "AF ×", "5 / 5", "STOP", "OFFLINE", "05", "05", "3 / 5")
+        SelfiePreviewSamples.samples.forEachIndexed { index, sample ->
+            compose.runOnIdle { state.value = sample.state }
+            compose.onNodeWithTag("phase_display").assertIsDisplayed().assertTextEquals(expectedPhases[index])
+            compose.onNodeWithTag("connection_status", useUnmergedTree = true)
+                .assertTextEquals(if (sample.state.connected) "カメラ接続中" else "カメラ未接続")
+            compose.onNodeWithTag("start_stop").assertIsDisplayed()
+                .assertTextEquals(if (sample.state.session.running) "STOP" else "START")
+            compose.onNodeWithTag("flow").assertExists()
+            if (sample.state.session.running) {
+                compose.onNodeWithTag("options").assertDoesNotExist()
+                compose.onNodeWithTag("camera_settings").assertIsNotEnabled()
+                compose.onNodeWithTag("results").assertExists()
+            } else {
+                compose.onNodeWithTag("options").assertExists()
+                compose.onNodeWithTag("camera_settings").assertIsEnabled()
+            }
         }
-        }
-        compose.onNodeWithTag("phase_hint").assertTextEquals("設定を確認して、STARTでもう一度撮影できます。")
-        compose.onNodeWithTag("progress").assertTextEquals("試行 5回 · 撮影操作 3回 · スキップ 2回")
+        compose.onNodeWithTag("phase_hint").assertTextEquals("5回中 3回撮影 · 2回スキップ")
+    }
+
+    @Test fun idleHintDependsOnConnection() {
+        val state = mutableStateOf(SelfieUiState())
+        compose.setContent { SelfieTheme { SelfieScreen(state.value, onAction = {}) } }
+        compose.onNodeWithTag("phase_hint").assertTextEquals("カメラを接続して、撮影を始めましょう。")
+        compose.runOnIdle { state.value = SelfieUiState(connected = true, settings = SelfieSettings(countdownSeconds = 10)) }
+        compose.onNodeWithTag("phase_hint").assertTextEquals("STARTのあと、スマホを置いて撮影位置へ")
+        compose.onNodeWithTag("phase_display").assertTextEquals("10")
     }
 
     @Test fun settingsAndButtonsEmitEventsWithoutOperatingCamera() {
@@ -84,7 +80,7 @@ class SelfieScreenTest {
         compose.onNodeWithTag("delay_10").performScrollTo().performClick()
         compose.onNodeWithTag("hold_100").performScrollTo().performClick()
         compose.onNodeWithTag("cycles_0").performScrollTo().performClick()
-        compose.onNodeWithTag("countdown_sound").performScrollTo().performClick()
+        compose.onNodeWithTag("sound_0").performScrollTo().performClick()
         compose.runOnIdle {
             assertEquals(SelfieUiAction.OpenConnection, events[0])
             assertEquals(SelfieUiAction.StartStop, events[1])
@@ -95,14 +91,15 @@ class SelfieScreenTest {
         }
         compose.onNodeWithTag("cycles_0").assertIsSelected()
         compose.onNodeWithTag("cycles_5").assertIsNotSelected()
+        compose.onNodeWithTag("phase_display").assertTextEquals("10")
     }
 
     @Test fun settingsLoadingDisablesStartButNeverDisablesStop() {
         val state = mutableStateOf(SelfieUiState(settingsLoaded = false))
         compose.setContent { SelfieTheme { SelfieScreen(state.value, onAction = {}) } }
         compose.onNodeWithTag("start_stop").assertIsNotEnabled()
-        compose.onNodeWithTag("delay_3").assertIsNotEnabled()
-        compose.onNodeWithTag("countdown_sound").performScrollTo().assertIsNotEnabled()
+        compose.onNodeWithTag("delay_3").performScrollTo().assertIsNotEnabled()
+        compose.onNodeWithTag("sound_1").performScrollTo().assertIsNotEnabled()
         compose.runOnIdle { state.value = state.value.copy(session = SelfieState(phase = SelfiePhase.FOCUSING)) }
         compose.onNodeWithTag("start_stop").assertIsEnabled().assertTextEquals("STOP")
     }
@@ -110,7 +107,7 @@ class SelfieScreenTest {
     @Test fun disconnectRestoresSettingsAndRequiresNewStart() {
         val state = SelfieUiState(session = SelfieState(phase = SelfiePhase.ERROR, disconnected = true, attempts = 2))
         compose.setContent { SelfieTheme { SelfieScreen(state, onAction = {}) } }
-        compose.onNodeWithTag("phase_display").assertTextEquals("切断")
+        compose.onNodeWithTag("phase_display").assertTextEquals("OFFLINE")
         compose.onNodeWithTag("start_stop").assertTextEquals("START")
         compose.onNodeWithTag("options").assertExists()
     }
@@ -119,13 +116,9 @@ class SelfieScreenTest {
     @Config(qualifiers = "ja-w320dp-h480dp")
     fun stopStaysVisibleWithLargeTextOnSmallScreen() {
         RuntimeEnvironment.setFontScale(1.5f)
-        val skin = mutableStateOf(AppSkin.SIMPLE)
-        compose.setContent { SelfieTheme(skin = skin.value) { SelfieScreen(SelfiePreviewSamples.samples[3].state, onAction = {}) } }
-        AppSkin.entries.forEach { style ->
-            compose.runOnIdle { skin.value = style }
-            compose.onNodeWithTag("start_stop").assertIsDisplayed().assertIsEnabled().assertTextEquals("STOP")
-        }
+        compose.setContent { SelfieTheme { SelfieScreen(SelfiePreviewSamples.samples[2].state, onAction = {}) } }
         compose.onNodeWithTag("start_stop").assertIsDisplayed().assertIsEnabled().assertTextEquals("STOP")
+        compose.onNodeWithTag("phase_display").assertIsDisplayed()
         compose.onNodeWithTag("options").assertDoesNotExist()
     }
 
@@ -138,7 +131,8 @@ class SelfieScreenTest {
         compose.onNodeWithTag("camera_settings").performClick()
         compose.onNodeWithTag("delay_3").performScrollTo().performClick()
         compose.onNodeWithTag("delay_5").assertIsSelected()
-        compose.onNodeWithTag("countdown_sound").performScrollTo().performClick().assertIsOn()
+        compose.onNodeWithTag("sound_0").performScrollTo().performClick()
+        compose.onNodeWithTag("sound_1").assertIsSelected()
         compose.runOnIdle { state.value = SelfiePreviewSamples.samples[3].state }
         compose.onNodeWithTag("start_stop").performClick().assertTextEquals("STOP")
         compose.runOnIdle {

@@ -125,9 +125,12 @@ class SelfieShowTest {
         val plain = Rig()
         plain.start(SelfieSettings())
         plain.cycle(true)
+        plain.cycle(false)
         plain.controller.stop()
         assertTrue(plain.cues.isEmpty())
         assertFalse(plain.showState.active)
+        assertEquals(0, plain.showState.poseId)
+        assertEquals(listOf(SelfieShotResult.SHOT, SelfieShotResult.SKIPPED), plain.showState.results)
 
         val stopped = Rig()
         stopped.start(SelfieSettings.KAWAII)

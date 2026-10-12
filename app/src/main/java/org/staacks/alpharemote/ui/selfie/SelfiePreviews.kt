@@ -6,12 +6,18 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import org.staacks.alpharemote.selfie.SelfiePhase
+import org.staacks.alpharemote.selfie.SelfieShotResult
 import org.staacks.alpharemote.selfie.SelfieState
 import org.staacks.alpharemote.selfie.SelfieSettings
 
 /** Immutable fixtures shared by IDE previews and headless rendering tests. */
 object SelfiePreviewSamples {
     data class Sample(val name: String, val state: SelfieUiState)
+    // Per-attempt results in order, as SelfieShow publishes them: shots first, skips last (sample data only).
+    private fun withResults(sample: Sample): Sample {
+        val s = sample.state.session
+        return sample.copy(state = sample.state.copy(results = List(s.shots) { SelfieShotResult.SHOT } + List(s.skipped) { SelfieShotResult.SKIPPED }))
+    }
     val samples = listOf(
         Sample("未接続", SelfieUiState()),
         Sample("接続済み・待機中", SelfieUiState(connected = true)),
@@ -34,7 +40,7 @@ object SelfiePreviewSamples {
             session = SelfieState(phase = SelfiePhase.COUNTDOWN, remainingSeconds = 5, attempts = 8, shots = 7, skipped = 1, targetCycles = 0))),
         Sample("スキップありで終了", SelfieUiState(connected = true,
             session = SelfieState(phase = SelfiePhase.COMPLETED, attempts = 5, shots = 3, skipped = 2))),
-    )
+    ).map { withResults(it) }
 }
 
 class SelfiePreviewProvider : PreviewParameterProvider<SelfieUiState> {
