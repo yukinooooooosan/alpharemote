@@ -143,3 +143,15 @@ versionCodeは7、versionNameは0.1.6。
 - 端末固有のMac／N100手順はローカルだけで更新し、Gitと配布ソースから除外する。
 
 **実機確認の現状：** Pixel 10 Proで5秒待機・5枚撮影はユーザー確認済み（Compose移行前、APK版未記録）。0.1.6の実機動作、網羅的な撮影確認とMacのAndroid StudioでのPreview操作は未検証。mainにはマージしない。
+
+## 未ビルド：SELFIE画面の視認性の調整
+
+クラウド環境（Android SDK・Google Mavenに接続不可）でコードのみ変更した。コンパイル・テスト・lintは未実行。N100で `testDebugUnitTest assembleDebug lintDebug` を通してから版番号を上げる。
+
+- 選択中の設定チップを `primary` 塗り＋`onPrimary` 文字にした。選択中とトラックのコントラスト比は約1.2から4.7以上（Simple / kawaii、通常／ダーク）。
+- 撮影中のSTOPを `onBackground` 塗り＋`background` 文字にした。背景とのコントラスト比は約1.2から12以上。
+- 大表示を日本語に統一（AF中・撮影中・AF失敗・切断・撮影終了・停止・5秒）。`"AF ×"` と `"—"` の直書きをリソース化し、ドイツ語も追加。
+- カウント以外の大表示を48spにそろえ、状態遷移での文字サイズの揺れを抑えた。撮影中は `primary` 色。
+- 撮影中に「撮影操作 n回 · スキップ n回」を表示。待機中は「撮影 1秒 · 回数 5回」の設定要約を表示。
+- 通知の進行表示を画面と同じ「試行 n / m · 撮影操作 · スキップ」にそろえた（従来は完了済み回数で、画面と1ずれていた）。
+- `SelfieScreenTest` の期待文言を更新し、`running_counts` と `settings_summary` の確認を追加した。

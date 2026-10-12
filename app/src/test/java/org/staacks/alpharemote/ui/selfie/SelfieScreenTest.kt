@@ -39,7 +39,7 @@ class SelfieScreenTest {
         val state = mutableStateOf(SelfieUiState())
         val skin = mutableStateOf(AppSkin.SIMPLE)
         compose.setContent { SelfieTheme(dark, skin.value) { SelfieScreen(state.value, onAction = {}) } }
-        val expectedPhases = listOf("5 sec", "5 sec", "3", "FOCUSING", "SHOOTING", "AF ×", "COMPLETED", "STOPPED", "—", "5 sec", "5", "COMPLETED")
+        val expectedPhases = listOf("5秒", "5秒", "3", "AF中", "撮影中", "AF失敗", "撮影終了", "停止", "切断", "5秒", "5", "撮影終了")
         AppSkin.entries.forEach { style ->
             SelfiePreviewSamples.samples.forEachIndexed { index, sample ->
                 compose.runOnIdle { state.value = sample.state; skin.value = style }
@@ -52,13 +52,21 @@ class SelfieScreenTest {
                     compose.onNodeWithTag("options").assertDoesNotExist()
                     compose.onNodeWithTag("camera_settings").assertDoesNotExist()
                     compose.onNodeWithTag("progress").assertTextEquals("試行 ${sample.state.session.attempts + 1} / ${if (sample.state.session.targetCycles == 0) "∞" else sample.state.session.targetCycles}")
+                    compose.onNodeWithTag("running_counts")
+                        .assertTextEquals("撮影操作 ${sample.state.session.shots}回 · スキップ ${sample.state.session.skipped}回")
                 } else {
+                    compose.onNodeWithTag("running_counts").assertDoesNotExist()
                     compose.onNodeWithTag("options").assertExists()
                     compose.onNodeWithTag("camera_settings").assertExists()
                 }
+                if (sample.state.session.phase == SelfiePhase.IDLE) {
+                    compose.onNodeWithTag("settings_summary").assertTextEquals("撮影 1秒 · 回数 5回")
+                } else {
+                    compose.onNodeWithTag("settings_summary").assertDoesNotExist()
+                }
         }
         }
-        compose.onNodeWithTag("phase_hint").assertTextEquals("撮影終了")
+        compose.onNodeWithTag("phase_hint").assertTextEquals("設定を確認して、STARTでもう一度撮影できます。")
         compose.onNodeWithTag("progress").assertTextEquals("試行 5回 · 撮影操作 3回 · スキップ 2回")
     }
 
@@ -102,7 +110,7 @@ class SelfieScreenTest {
     @Test fun disconnectRestoresSettingsAndRequiresNewStart() {
         val state = SelfieUiState(session = SelfieState(phase = SelfiePhase.ERROR, disconnected = true, attempts = 2))
         compose.setContent { SelfieTheme { SelfieScreen(state, onAction = {}) } }
-        compose.onNodeWithTag("phase_display").assertTextEquals("—")
+        compose.onNodeWithTag("phase_display").assertTextEquals("切断")
         compose.onNodeWithTag("start_stop").assertTextEquals("START")
         compose.onNodeWithTag("options").assertExists()
     }

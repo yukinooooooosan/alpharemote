@@ -1,6 +1,6 @@
 <resources>
-    <string name="ui_completed">COMPLETED</string>
-    <string name="ui_stopped">STOPPED</string>
+    <string name="ui_completed">Fertig</string>
+    <string name="ui_stopped">Gestoppt</string>
     <string name="ui_not_connected_hint">Verbinde deine Kamera, um zu starten.</string>
     <string name="ui_single_note">Für Einzelbilder den Einzelbildmodus an der Kamera wählen.</string>
     <string name="ui_burst_note">Für Serienbilder den Serienbildmodus an der Kamera wählen.</string>
@@ -47,4 +47,10 @@
     <string name="ui_skin">Design</string>
     <string name="ui_skin_simple">Schlicht</string>
     <string name="ui_skin_hint">Hell oder dunkel folgt den Geräteeinstellungen.</string>
+    <string name="ui_af_failed_display">AF-Fehler</string>
+    <string name="ui_disconnected_display">Getrennt</string>
+    <string name="ui_af_failed_hint">Dieser Versuch wird übersprungen.</string>
+    <string name="ui_restart_hint">Einstellungen prüfen und mit START erneut aufnehmen.</string>
+    <string name="ui_running_counts">Auslösungen %1$d · Übersprungen %2$d</string>
+    <string name="ui_settings_summary">Aufnahme %1$s · Versuche %2$s</string>
 </resources>

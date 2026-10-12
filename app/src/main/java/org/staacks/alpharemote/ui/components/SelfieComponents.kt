@@ -75,8 +75,9 @@ fun SelfiePrimaryButton(label: String, onClick: () -> Unit, modifier: Modifier =
         border = if (kawaii) BorderStroke(2.dp, MaterialTheme.colorScheme.primary.copy(alpha = .45f)) else null,
         elevation = if (kawaii) ButtonDefaults.buttonElevation(defaultElevation = 3.dp, pressedElevation = 1.dp)
             else ButtonDefaults.buttonElevation(),
-        colors = if (stopping) ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondaryContainer,
-            contentColor = MaterialTheme.colorScheme.onSecondaryContainer) else ButtonDefaults.buttonColors()) {
+        // STOP is the only control while shooting: high-contrast inverse colors in every skin and theme.
+        colors = if (stopping) ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.onBackground,
+            contentColor = MaterialTheme.colorScheme.background) else ButtonDefaults.buttonColors()) {
         Text(label, style = MaterialTheme.typography.titleLarge,
             fontWeight = if (kawaii) FontWeight.ExtraBold else FontWeight.SemiBold,
             letterSpacing = if (kawaii) 2.sp else 0.sp)
@@ -98,14 +99,18 @@ fun SelfieSegmentedControl(label: String, choices: List<Pair<Int, String>>, sele
                     .selectable(selected = checked, enabled = enabled, role = Role.RadioButton, onClick = { onSelected(value) })
                     .testTag("${tag}_$value"),
                     shape = RoundedCornerShape(if (kawaii) 16.dp else 12.dp),
-                    border = if (checked) BorderStroke(if (kawaii) 2.dp else 1.dp,
-                        if (kawaii) MaterialTheme.colorScheme.primary.copy(alpha = .5f) else MaterialTheme.colorScheme.outlineVariant) else null,
-                    color = if (checked) MaterialTheme.colorScheme.surface else MaterialTheme.colorScheme.surfaceContainerHighest) {
+                    // Selected choice is a filled pill so it reads at a glance, not only by bold text.
+                    border = if (checked && kawaii) BorderStroke(2.dp, MaterialTheme.colorScheme.onPrimary.copy(alpha = .6f)) else null,
+                    color = when {
+                        checked && enabled -> MaterialTheme.colorScheme.primary
+                        checked -> MaterialTheme.colorScheme.onSurface.copy(alpha = .12f)
+                        else -> MaterialTheme.colorScheme.surfaceContainerHighest
+                    }) {
                     Box(Modifier.padding(horizontal = 2.dp, vertical = 12.dp), contentAlignment = Alignment.Center) {
                         Text(text, textAlign = TextAlign.Center, style = MaterialTheme.typography.labelLarge,
                             fontWeight = if (checked) FontWeight.Bold else FontWeight.Normal,
                             color = if (!enabled) MaterialTheme.colorScheme.onSurface.copy(alpha = .38f)
-                                else if (checked) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant)
+                                else if (checked) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurfaceVariant)
                     }
                 }
             }

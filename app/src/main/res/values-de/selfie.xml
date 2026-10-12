@@ -23,8 +23,6 @@
     <string name="selfie_shoot_hint">Pose halten.</string>
     <string name="selfie_af_failed">AF fehlgeschlagen · Versuch übersprungen</string>
     <string name="selfie_disconnected">Die Kameraverbindung wurde getrennt. Nach dem Verbinden erneut START drücken.</string>
-    <string name="selfie_done">Aufnahmen beendet</string>
-    <string name="selfie_stopped">Gestoppt</string>
     <string name="selfie_connection_hint">Die Kamera in den Einstellungen koppeln und die Bluetooth-Fernbedienung an der Kamera aktivieren.</string>
     <string name="selfie_drive_hint">Für Serienaufnahmen die Kamera auf Serienbildmodus stellen. Für „1 Bild“ den Einzelbildmodus verwenden.</string>
     <string name="selfie_sound_hint">AF-Fehler und Ende bleiben hörbar. Die Lautstärke wird über die Weckerlautstärke des Handys eingestellt.</string>
@@ -33,4 +31,6 @@
     <string name="selfie_fork_credit">Diese App ist eine modifizierte Version von α-Remote von Sebastian Staacks (GPL-3.0). Sie ist keine offizielle Sony-App.</string>
     <string name="selfie_source">Quellcode der modifizierten App</string>
     <string name="selfie_cycle_progress">Versuch %1$d / %2$s</string>
+    <string name="selfie_focusing">AF läuft</string>
+    <string name="selfie_shooting">Auslösen</string>
 </resources>

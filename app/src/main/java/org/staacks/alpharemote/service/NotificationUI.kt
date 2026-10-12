@@ -69,8 +69,10 @@ class NotificationUI(private val context: Context) {
                 else -> context.getString(R.string.selfie_offline)
             }
         }
-        val progress = context.getString(R.string.selfie_progress,
-            selfieState.attempts, selfieState.shots, selfieState.skipped)
+        // Same wording as the SELFIE screen: current attempt, then completed shots and skips.
+        val progress = context.getString(R.string.selfie_cycle_progress, selfieState.attempts + 1,
+            if (selfieState.targetCycles == 0) "∞" else selfieState.targetCycles.toString()) + " · " +
+            context.getString(R.string.ui_running_counts, selfieState.shots, selfieState.skipped)
         val builder = NotificationCompat.Builder(context, channelId)
             .setContentIntent(openAppIntent())
             .setSmallIcon(R.drawable.ic_camera_black_24dp)

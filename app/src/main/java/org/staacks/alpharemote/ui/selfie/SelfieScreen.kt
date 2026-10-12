@@ -19,6 +19,7 @@ import androidx.compose.ui.unit.sp
 import org.staacks.alpharemote.R
 import org.staacks.alpharemote.ui.appearance.AppSkin
 import org.staacks.alpharemote.selfie.SelfiePhase
+import org.staacks.alpharemote.selfie.SelfieSettings
 import org.staacks.alpharemote.ui.components.*
 
 /** Stateless UI. No BLE, service, timers or persistence, including interactive previews. */
@@ -94,30 +95,31 @@ fun SelfieScreen(state: SelfieUiState, onAction: (SelfieUiAction) -> Unit, modif
 @Composable
 private fun PhaseDisplay(state: SelfieUiState) {
     val session = state.session
+    val kawaii = LocalSelfieSkin.current == AppSkin.KAWAII
     val phaseText = when (session.phase) {
         SelfiePhase.COUNTDOWN -> session.remainingSeconds.toString()
         SelfiePhase.FOCUSING -> stringResource(R.string.selfie_focusing)
         SelfiePhase.SHOOTING -> stringResource(R.string.selfie_shooting)
-        SelfiePhase.ERROR -> if (session.disconnected) "—" else "AF ×"
+        SelfiePhase.ERROR -> stringResource(if (session.disconnected) R.string.ui_disconnected_display else R.string.ui_af_failed_display)
         SelfiePhase.COMPLETED -> stringResource(R.string.ui_completed)
         SelfiePhase.STOPPED -> stringResource(R.string.ui_stopped)
         else -> stringResource(R.string.selfie_seconds_display, state.settings.countdownSeconds)
     }
+    // Countdown digits stay largest; other states share one size so the layout does not jump between phases.
     Text(phaseText, Modifier.fillMaxWidth().heightIn(min = 128.dp).wrapContentHeight().testTag("phase_display"),
-        textAlign = TextAlign.Center, fontWeight = if (LocalSelfieSkin.current == AppSkin.KAWAII) FontWeight.ExtraBold else FontWeight.Light,
-        fontSize = when { session.phase == SelfiePhase.COUNTDOWN -> 104.sp; session.phase == SelfiePhase.IDLE -> 64.sp; else -> 34.sp },
+        textAlign = TextAlign.Center, fontWeight = if (kawaii) FontWeight.ExtraBold else FontWeight.Light,
+        fontSize = when (session.phase) { SelfiePhase.COUNTDOWN -> 104.sp; SelfiePhase.IDLE -> 64.sp; else -> 48.sp },
         color = when {
             session.phase == SelfiePhase.ERROR -> MaterialTheme.colorScheme.error
-            LocalSelfieSkin.current == AppSkin.KAWAII -> MaterialTheme.colorScheme.primary
+            kawaii || session.phase == SelfiePhase.SHOOTING -> MaterialTheme.colorScheme.primary
             else -> MaterialTheme.colorScheme.onBackground
         })
     val hint = when (session.phase) {
         SelfiePhase.COUNTDOWN -> R.string.selfie_next_shot
         SelfiePhase.FOCUSING -> R.string.selfie_focus_hint
         SelfiePhase.SHOOTING -> R.string.selfie_shoot_hint
-        SelfiePhase.ERROR -> if (session.disconnected) R.string.selfie_disconnected else R.string.selfie_af_failed
-        SelfiePhase.COMPLETED -> R.string.selfie_done
-        SelfiePhase.STOPPED -> R.string.selfie_stopped
+        SelfiePhase.ERROR -> if (session.disconnected) R.string.selfie_disconnected else R.string.ui_af_failed_hint
+        SelfiePhase.COMPLETED, SelfiePhase.STOPPED -> R.string.ui_restart_hint
         else -> if (state.connected) R.string.selfie_ready else R.string.ui_not_connected_hint
     }
     Text(stringResource(hint), Modifier.testTag("phase_hint"), textAlign = TextAlign.Center,
@@ -130,4 +132,30 @@ private fun PhaseDisplay(state: SelfieUiState) {
     }
     if (progress.isNotEmpty()) Text(progress, Modifier.padding(top = 12.dp).testTag("progress"),
         textAlign = TextAlign.Center, color = MaterialTheme.colorScheme.primary, style = MaterialTheme.typography.labelMedium)
+    if (session.running && session.attempts > 0) {
+        Text(stringResource(R.string.ui_running_counts, session.shots, session.skipped),
+            Modifier.padding(top = 4.dp).testTag("running_counts"), textAlign = TextAlign.Center,
+            color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.labelMedium)
+    }
+    if (session.phase == SelfiePhase.IDLE) {
+        Text(stringResource(R.string.ui_settings_summary, holdLabel(state.settings.holdMillis), cyclesLabel(state.settings.cycles)),
+            Modifier.padding(top = 12.dp).testTag("settings_summary"), textAlign = TextAlign.Center,
+            color = MaterialTheme.colorScheme.primary, style = MaterialTheme.typography.labelMedium)
+    }
 }
+
+@Composable
+private fun holdLabel(holdMillis: Int): String = stringResource(when (holdMillis) {
+    SelfieSettings.SINGLE_SHOT_MILLIS -> R.string.selfie_single
+    500 -> R.string.selfie_hold_half
+    1000 -> R.string.selfie_hold_one
+    else -> R.string.selfie_hold_two
+})
+
+@Composable
+private fun cyclesLabel(cycles: Int): String = stringResource(when (cycles) {
+    1 -> R.string.selfie_cycles_one
+    5 -> R.string.selfie_cycles_five
+    10 -> R.string.selfie_cycles_ten
+    else -> R.string.selfie_infinite
+})
