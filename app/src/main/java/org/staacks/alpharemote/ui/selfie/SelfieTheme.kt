@@ -9,30 +9,33 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
+import org.staacks.alpharemote.R
 import org.staacks.alpharemote.ui.appearance.AppSkin
 
-// One restrained palette for all four pages and navigation. No per-device dynamic colors.
-private val SelfieLightColors = lightColorScheme(
-    primary = Color(0xFF506A47), onPrimary = Color.White,
-    primaryContainer = Color(0xFFDCE8D5), onPrimaryContainer = Color(0xFF253820),
-    secondaryContainer = Color(0xFFE4E7DF), onSecondaryContainer = Color(0xFF282F25),
-    background = Color(0xFFF7F7F2), onBackground = Color(0xFF22251F),
-    surface = Color(0xFFFFFFFF), onSurface = Color(0xFF22251F),
-    surfaceContainerLow = Color(0xFFFFFFFF), surfaceContainer = Color(0xFFF0F1EA),
-    surfaceContainerHighest = Color(0xFFEDEFE7), onSurfaceVariant = Color(0xFF5C6357),
-    outline = Color(0xFF747D6E), outlineVariant = Color(0xFFD9DED2),
+// Simple skin: one dark "viewfinder" palette for all four pages and the tab bar, like a camera's own display.
+// It ignores the system light/dark setting on purpose. No per-device dynamic colors.
+private val FinderColors = darkColorScheme(
+    primary = Color(0xFFFFB020), onPrimary = Color(0xFF0D0E0F),
+    primaryContainer = Color(0xFF3A2C0E), onPrimaryContainer = Color(0xFFFFD98A),
+    secondary = Color(0xFFB9B9B0), onSecondary = Color(0xFF0D0E0F),
+    secondaryContainer = Color(0xFF24262A), onSecondaryContainer = Color(0xFFEDEDE8),
+    background = Color(0xFF0D0E0F), onBackground = Color(0xFFEDEDE8),
+    surface = Color(0xFF151618), onSurface = Color(0xFFEDEDE8),
+    surfaceContainerLowest = Color(0xFF0D0E0F), surfaceContainerLow = Color(0xFF151618),
+    surfaceContainer = Color(0xFF1B1D20), surfaceContainerHigh = Color(0xFF202226),
+    surfaceContainerHighest = Color(0xFF24262A), onSurfaceVariant = Color(0xFF9A9A92),
+    outline = Color(0xFF55585C), outlineVariant = Color(0xFF2C2E30),
+    error = Color(0xFFFF4D4D), onError = Color(0xFF0D0E0F),
 )
-private val SelfieDarkColors = darkColorScheme(
-    primary = Color(0xFFBDD5AD), onPrimary = Color(0xFF20351A),
-    primaryContainer = Color(0xFF354B2C), onPrimaryContainer = Color(0xFFDBECD1),
-    secondaryContainer = Color(0xFF30372D), onSecondaryContainer = Color(0xFFE4E9DF),
-    background = Color(0xFF171A16), onBackground = Color(0xFFF0F2E9),
-    surface = Color(0xFF22271F), onSurface = Color(0xFFF0F2E9),
-    surfaceContainerLow = Color(0xFF22271F), surfaceContainer = Color(0xFF272D24),
-    surfaceContainerHighest = Color(0xFF30372B), onSurfaceVariant = Color(0xFFB6BFAE),
-    outline = Color(0xFF88937E), outlineVariant = Color(0xFF434C3C),
-)
+
+/** Fonts of the Simple (viewfinder) look, shared by all pages. */
+object FinderFonts {
+    val Display = FontFamily(Font(R.font.barlow_condensed_semibold, FontWeight.SemiBold), Font(R.font.barlow_condensed_bold, FontWeight.Bold))
+    val Mono = FontFamily(Font(R.font.ibm_plex_mono_medium, FontWeight.Medium), Font(R.font.ibm_plex_mono_semibold, FontWeight.SemiBold))
+}
 
 val LocalSelfieSkin = staticCompositionLocalOf { AppSkin.SIMPLE }
 
@@ -74,7 +77,7 @@ private val KawaiiTypography = SimpleTypography.copy(
 fun SelfieTheme(darkTheme: Boolean = isSystemInDarkTheme(), skin: AppSkin = AppSkin.SIMPLE,
                 content: @Composable () -> Unit) {
     val colors = when (skin) {
-        AppSkin.SIMPLE -> if (darkTheme) SelfieDarkColors else SelfieLightColors
+        AppSkin.SIMPLE -> FinderColors
         AppSkin.KAWAII -> if (darkTheme) KawaiiDarkColors else KawaiiLightColors
     }
     CompositionLocalProvider(LocalSelfieSkin provides skin) {

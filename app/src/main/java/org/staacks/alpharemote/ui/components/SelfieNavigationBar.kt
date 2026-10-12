@@ -20,7 +20,13 @@ fun SelfieNavigationBar(selected: Int, onSelect: (Int) -> Unit) {
         ).forEach { (id, icon, label) ->
             NavigationBarItem(selected == id, { onSelect(id) },
                 icon = { Icon(painterResource(icon), contentDescription = null) },
-                label = { Text(stringResource(label)) }, modifier = Modifier.testTag("nav_$id"))
+                label = { Text(stringResource(label)) }, modifier = Modifier.testTag("nav_$id"),
+                colors = NavigationBarItemDefaults.colors(
+                    selectedIconColor = MaterialTheme.colorScheme.primary,
+                    selectedTextColor = MaterialTheme.colorScheme.primary,
+                    indicatorColor = MaterialTheme.colorScheme.surfaceContainerHighest,
+                    unselectedIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                    unselectedTextColor = MaterialTheme.colorScheme.onSurfaceVariant))
         }
     }
 }

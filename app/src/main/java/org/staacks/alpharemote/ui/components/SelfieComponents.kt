@@ -23,6 +23,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.semantics.clearAndSetSemantics
 import org.staacks.alpharemote.ui.appearance.AppSkin
+import org.staacks.alpharemote.ui.selfie.FinderFonts
 import org.staacks.alpharemote.ui.selfie.LocalSelfieSkin
 
 /** Shared visual components. All actions belong to their runtime adapters. */
@@ -37,8 +38,13 @@ fun SelfiePage(tag: String, content: @Composable ColumnScope.() -> Unit) {
 }
 
 @Composable
-fun SelfiePageTitle(title: String, subtitle: String? = null) {
+fun SelfiePageTitle(title: String, subtitle: String? = null, eyebrow: String? = null) {
     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        // Simple skin: a camera-style readout above the title, as on the viewfinder.
+        if (eyebrow != null && LocalSelfieSkin.current == AppSkin.SIMPLE) {
+            Text(eyebrow, color = MaterialTheme.colorScheme.primary, fontFamily = FinderFonts.Mono,
+                fontWeight = FontWeight.SemiBold, fontSize = 12.sp, letterSpacing = 3.sp)
+        }
         Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
             Text(title, style = MaterialTheme.typography.headlineLarge,
                 modifier = Modifier.weight(1f).semantics { heading() })
@@ -53,8 +59,8 @@ fun SelfieSection(title: String? = null, content: @Composable ColumnScope.() -> 
     Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
         title?.let { Text(it, style = MaterialTheme.typography.titleSmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.semantics { heading() }) }
-        Surface(shape = RoundedCornerShape(if (LocalSelfieSkin.current == AppSkin.KAWAII) 32.dp else 24.dp),
-            border = if (LocalSelfieSkin.current == AppSkin.KAWAII) BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant) else null,
+        Surface(shape = RoundedCornerShape(if (LocalSelfieSkin.current == AppSkin.KAWAII) 32.dp else 16.dp),
+            border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
             color = MaterialTheme.colorScheme.surfaceContainerLow) {
             Column(Modifier.fillMaxWidth().padding(20.dp), verticalArrangement = Arrangement.spacedBy(16.dp), content = content)
         }

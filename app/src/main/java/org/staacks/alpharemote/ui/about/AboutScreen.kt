@@ -15,7 +15,7 @@ import org.staacks.alpharemote.ui.components.*
 fun AboutScreen(versionName: String, versionCode: Int, onLicense: () -> Unit, onOpenSource: (String) -> Unit,
                 skin: AppSkin = AppSkin.SIMPLE, skinLoaded: Boolean = true, onSkinChange: (AppSkin) -> Unit = {}) {
     SelfiePage("about_screen") {
-        SelfiePageTitle(stringResource(R.string.ui_preferences_title))
+        SelfiePageTitle(stringResource(R.string.ui_preferences_title), eyebrow = stringResource(R.string.finder_eyebrow_settings))
         SelfieSection(stringResource(R.string.ui_appearance)) {
             SelfieSegmentedControl(stringResource(R.string.ui_skin), listOf(
                 AppSkin.SIMPLE.ordinal to stringResource(R.string.ui_skin_simple),

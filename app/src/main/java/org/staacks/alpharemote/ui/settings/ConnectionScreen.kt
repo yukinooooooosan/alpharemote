@@ -16,7 +16,8 @@ import org.staacks.alpharemote.ui.settings.SettingsViewModel.SettingsUIState
 @Composable
 fun ConnectionScreen(state: SettingsUIState, onAction: (SettingsUIAction) -> Unit) {
     SelfiePage("connection_screen") {
-        SelfiePageTitle(stringResource(R.string.selfie_connection_title), stringResource(R.string.ui_connection_subtitle))
+        SelfiePageTitle(stringResource(R.string.selfie_connection_title), stringResource(R.string.ui_connection_subtitle),
+            eyebrow = stringResource(R.string.finder_eyebrow_connection))
         SelfieSection {
             Text(stringResource(if (state.cameraState == SettingsUICameraState.CONNECTED) R.string.selfie_connected else R.string.selfie_offline),
                 style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.primary)

@@ -33,4 +33,7 @@
     <string name="finder_stop_title" translatable="false">STOP</string>
     <string name="finder_sound_on" translatable="false">ON</string>
     <string name="finder_sound_off" translatable="false">OFF</string>
+    <string name="finder_eyebrow_connection" translatable="false">CAMERA LINK</string>
+    <string name="finder_eyebrow_manual" translatable="false">MANUAL</string>
+    <string name="finder_eyebrow_settings" translatable="false">SETTINGS</string>
 </resources>

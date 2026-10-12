@@ -9,7 +9,7 @@
         <item name="colorSecondary">#506A47</item>
         <item name="colorSecondaryVariant">#506A47</item>
         <item name="colorOnSecondary">@color/white</item>
-        <item name="android:windowBackground">#F7F7F2</item>
+        <item name="android:windowBackground">#0D0E0F</item>
         <!-- Status bar color. -->
         <item name="android:statusBarColor">?attr/colorPrimaryVariant</item>
 

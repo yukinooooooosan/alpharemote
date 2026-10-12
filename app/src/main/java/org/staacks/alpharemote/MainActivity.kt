@@ -2,7 +2,12 @@ package org.staacks.alpharemote
 
 import android.content.Intent
 import android.os.Bundle
+import androidx.activity.SystemBarStyle
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import org.staacks.alpharemote.ui.appearance.AppSkin
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.findNavController
 import androidx.compose.runtime.mutableIntStateOf
@@ -31,7 +36,7 @@ class MainActivity : AppCompatActivity() {
     val SELECTED_PAGE = "selected_page"
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        enableEdgeToEdge()
+        applySystemBars(AppSkin.SIMPLE)
 
         super.onCreate(savedInstanceState)
 
@@ -43,12 +48,24 @@ class MainActivity : AppCompatActivity() {
         binding.navView.setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
         val appearance = ViewModelProvider(this)[AppearanceViewModel::class.java]
         binding.navView.setContent {
+            val skin by appearance.skin.collectAsStateWithLifecycle()
+            LaunchedEffect(skin) { applySystemBars(skin ?: AppSkin.SIMPLE) }
             RuntimeSelfieTheme(appearance) { SelfieNavigationBar(selectedPage.intValue, ::navigateTo) }
         }
 
         var startPage = intent?.getIntExtra(NAVIGATE_TO_INTENT_EXTRA, R.id.navigation_selfie) ?: R.id.navigation_selfie
         startPage = savedInstanceState?.getInt(SELECTED_PAGE, startPage) ?: startPage
         navigateTo(startPage)
+    }
+
+    /** Simple is always dark (viewfinder), so its bar icons stay light; kawaii follows the system theme. */
+    private fun applySystemBars(skin: AppSkin) {
+        if (skin == AppSkin.KAWAII) {
+            enableEdgeToEdge()
+        } else {
+            val dark = SystemBarStyle.dark(android.graphics.Color.TRANSPARENT)
+            enableEdgeToEdge(statusBarStyle = dark, navigationBarStyle = dark)
+        }
     }
 
     override fun onNewIntent(intent: Intent?) {

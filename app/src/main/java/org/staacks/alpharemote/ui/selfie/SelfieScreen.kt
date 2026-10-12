@@ -99,7 +99,7 @@ private object Finder {
     val Ink = Color(0xFFEDEDE8)
     val Sub = Color(0xFFB9B9B0)
     val Muted = Color(0xFF9A9A92)
-    val Dim = Color(0xFF6E7072)
+    val Dim = Color(0xFF85878A)
     val Line = Color(0xFF2C2E30)
     val Amber = Color(0xFFFFB020)
     val Green = Color(0xFF4ADE80)

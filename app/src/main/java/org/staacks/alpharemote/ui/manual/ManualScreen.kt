@@ -20,7 +20,8 @@ import org.staacks.alpharemote.ui.components.*
 @Composable
 fun ManualScreen() {
     SelfiePage("manual_screen") {
-        SelfiePageTitle(stringResource(R.string.manual_title), stringResource(R.string.ui_quick_start))
+        SelfiePageTitle(stringResource(R.string.manual_title), stringResource(R.string.ui_quick_start),
+            eyebrow = stringResource(R.string.finder_eyebrow_manual))
         SelfieSection {
             QuickStep(1, R.string.ui_step_connect, R.string.ui_step_connect_body)
             QuickStep(2, R.string.ui_step_settings, R.string.ui_step_settings_body)
