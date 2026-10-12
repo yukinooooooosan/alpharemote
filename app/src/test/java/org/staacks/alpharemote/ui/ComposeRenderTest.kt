@@ -47,7 +47,7 @@ class ComposeRenderTest {
                 key(page.value, dark.value, skin.value) {
                     when (page.value) {
                         "manual" -> ManualScreen()
-                        "about" -> AboutScreen("0.1.6", 7, {}, {}, skin = skin.value)
+                        "about" -> AboutScreen("0.1.7", 8, {}, {}, skin = skin.value)
                         "connection" -> ConnectionScreen(ConnectionPreviewSamples.ready, {})
                         else -> if (skin.value == AppSkin.KAWAII) KawaiiSelfieScreen(kawaii.value.state, kawaii.value.show, {})
                             else SelfieScreen(sample.value, {})

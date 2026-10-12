@@ -47,7 +47,7 @@ fun ManualPreview() { SelfieTheme { ManualScreen() } }
 @Preview(name = "通常", group = "アプリ情報", widthDp = 393, heightDp = 800, apiLevel = 36, locale = "ja", uiMode = Configuration.UI_MODE_NIGHT_NO)
 @Preview(name = "ダーク", group = "アプリ情報", widthDp = 393, heightDp = 800, apiLevel = 36, locale = "ja", uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
-fun AboutPreview() { SelfieTheme { AboutScreen("0.1.6", 7, onLicense = {}, onOpenSource = {}) } }
+fun AboutPreview() { SelfieTheme { AboutScreen("0.1.7", 8, onLicense = {}, onOpenSource = {}) } }
 
 @Preview(name = "通常", group = "カメラ接続・kawaii", widthDp = 393, heightDp = 800, apiLevel = 36, locale = "ja", uiMode = Configuration.UI_MODE_NIGHT_NO)
 @Preview(name = "ダーク", group = "カメラ接続・kawaii", widthDp = 393, heightDp = 800, apiLevel = 36, locale = "ja", uiMode = Configuration.UI_MODE_NIGHT_YES)
@@ -65,5 +65,5 @@ fun ManualKawaiiPreview() { SelfieTheme(skin = AppSkin.KAWAII) { ManualScreen() 
 @Preview(name = "ダーク", group = "設定・kawaii", widthDp = 393, heightDp = 800, apiLevel = 36, locale = "ja", uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
 fun AboutKawaiiPreview() {
-    SelfieTheme(skin = AppSkin.KAWAII) { AboutScreen("0.1.6", 7, {}, {}, skin = AppSkin.KAWAII) }
+    SelfieTheme(skin = AppSkin.KAWAII) { AboutScreen("0.1.7", 8, {}, {}, skin = AppSkin.KAWAII) }
 }

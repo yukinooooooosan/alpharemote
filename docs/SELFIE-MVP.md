@@ -1,4 +1,4 @@
-# Selfie Remote v0.1.6
+# Selfie Remote v0.1.7
 
 Sony αのBluetoothリモコン機能を使う、自撮り用Androidアプリ。
 Sebastian Staacksの[α-Remote](https://github.com/Staacks/alpharemote)をベースにしたGPL-3.0の改変版です。Sony公式アプリではありません。
@@ -55,7 +55,7 @@ AFタイムアウトはシャッターを解除して、エラー音を鳴らし
 
 ## UIの調整
 
-- 「設定」→「外観」→「スキン」でシンプル／kawaiiを選ぶ。初期値はシンプルで、v0.1.5の見た目を維持する。kawaiiはピンク・ラベンダー、太い文字、丸い部品、小さなハートと星の装飾を使う。
+- 「設定」→「外観」→「スキン」でシンプル／kawaiiを選ぶ。初期値はシンプル。シンプルは設定を選べる従来の画面、kawaiiのSELFIEは固定設定のプリクラ風専用画面を使う。
 - スキンは撮影設定と別のDataStoreキーに保存し、4画面と下部タブへ反映する。通常／ダークは端末の設定に合わせる。撮影中の状態やカメラ設定には影響しない。
 - 両スキンの共通の色と文字は `ui/selfie/SelfieTheme.kt`、余白・角丸・選択UIは `ui/components/SelfieComponents.kt` で定義する。
 - SELFIEの状態Previewは `SelfiePreviews.kt`、他の3画面は `ui/components/AppPreviews.kt` をAndroid StudioのSplit / Designで開く（PreviewはAPI 36）。

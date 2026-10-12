@@ -169,3 +169,20 @@ versionCodeは7、versionNameは0.1.6。
 - `KawaiiSelfieScreen`：モックを移植したプリクラ風画面。kawaiiスキンのときだけSELFIEタブで使う。
 - テスト追加：`SelfieShowTest`、`KawaiiSelfieScreenTest`（Robolectric）。`ComposeRenderTest` にkawaii画面とAF失敗・終了を追加。
 - 実機未確認：アニメーションの見え方、2〜3m先からの読みやすさ、小画面での中央部のはみ出し。
+
+
+## 0.1.7：kawaii改造版のN100検証とAPKビルド
+
+2026-10-13。クラウドで作成した `4bd0f36` の改造版を取得し、N100の実プロジェクト・依存関係でAndroid / Composeをコンパイルして検証した。配布版をversionName 0.1.7、versionCode 8に更新した。
+
+- `testDebugUnitTest assembleDebug lintDebug --no-daemon`：成功。全81件、失敗・エラー・スキップ0件。
+- 既存のテスト67件に、撮影Controllerの初回待機2件、SelfieShowの4件、API 31 / 36のkawaii画面8件を追加した構成。
+- 初回10秒・以降5秒、全押し100ms・5試行、AF失敗のスキップ、撮影直前AF、STOPと切断、シンプルの従来設定を検証した。ポーズの重複回避と画面用ID／音声合図の一致も確認した。
+- kawaiiの10状態、操作イベント、撮影中の接続操作無効化、320×480dp・文字倍率1.5でSTOPが表示され有効なことを確認した。
+- API 36 / Robolectric Native Graphicsで4画面とカウント／AF／撮影／AF失敗／終了の両スキン・通常／ダーク計36枚を生成した。kawaiiのSELFIEは端末の通常／ダークによらず明るい配色という仕様。
+- Android lint：エラー0件、警告106件。旧リソース・非推奨API・依存関係の更新案内等を含む。
+- 同梱GPL本文はroot LICENSEと同一。フォントのOFL全文をAPK内に同梱している。CameraBLEの通信部分に今回の変更なし。
+- APK署名は従来の証明書SHA-256 `c8a131c390f88da5600d8163649eaf721fccfaf66898776756d38263d2b6d0e1` とアプリIDを維持。上書きインストール用のversionCodeを増やした。
+- 音声ファイルは未収録。今回の検証は演出合図と画面表示を対象とし、実際のMediaPlayerによる音声再生・待ち列／割り込みは未検証。音声未収録のため現在のAPKでは従来の電子音を使う。
+
+**実機確認の現状：** Pixel 10 Proで5秒待機・5枚撮影はCompose移行前にユーザー確認済み。0.1.7の実機起動・撮影、画面OFF、通知STOP、2〜3mからの演出の見やすさ、Mac IDEのPreview操作は未検証。mainへはマージしない。
