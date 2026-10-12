@@ -35,6 +35,37 @@
     <string name="kawaii_stopped" translatable="false">ストップ\nしたよ</string>
     <string name="kawaii_stopped_sub" translatable="false">また撮ろうね</string>
     <string name="kawaii_disconnected" translatable="false">あれ、\nカメラが…</string>
+    <string name="kawaii_manual_title" translatable="false">あそびかた</string>
+    <string name="kawaii_manual_subtitle" translatable="false">ひとりで撮影会！ 5回パシャッとするよ</string>
+    <string name="kawaii_manual_flow_wait" translatable="false">10びょう</string>
+    <string name="kawaii_manual_flow_pose" translatable="false">ポーズ</string>
+    <string name="kawaii_manual_flow_count" translatable="false">3・2・1</string>
+    <string name="kawaii_manual_flow_shot" translatable="false">パシャッ ×5</string>
+    <string name="kawaii_manual_step1_title" translatable="false">カメラをつなぐ</string>
+    <string name="kawaii_manual_step1_body" translatable="false">「カメラ接続」タブから、カメラとペアリング。1回やれば、次からはカメラの電源を入れるだけでOK！</string>
+    <string name="kawaii_manual_step1_note" translatable="false">カメラの「Bluetoothリモコン」をONにしておいてね</string>
+    <string name="kawaii_manual_step2_title" translatable="false">カメラを「1枚撮り」に</string>
+    <string name="kawaii_manual_step2_body" translatable="false">カメラ本体のドライブモードを「1枚撮り（単写）」にしてね。ピントの設定もカメラで決めておこう。</string>
+    <string name="kawaii_manual_step2_note" translatable="false">連写のままだと、1回で何枚も撮れちゃうよ</string>
+    <string name="kawaii_manual_step3_title" translatable="false">スマホを自分に向けて置く</string>
+    <string name="kawaii_manual_step3_body" translatable="false">スマホをカメラの横に置いて、画面をこっちに向けてね。2〜3m離れても、数字とポーズが見えるよ。</string>
+    <string name="kawaii_manual_step4_title" translatable="false">スタート！</string>
+    <string name="kawaii_manual_step4_body" translatable="false">スタートを押したら、10びょうで位置について。ポーズ指示にあわせて、5回パシャッ！ 毎回、撮る直前にピントを合わせ直すよ。</string>
+    <string name="kawaii_manual_step4_note" translatable="false">2回目からは5びょうごとに撮影するよ</string>
+    <string name="kawaii_manual_illustration" translatable="false">カメラの横にスマホを置き、画面を2〜3m先の自分に向けるイラスト</string>
+    <string name="kawaii_manual_distance" translatable="false">2〜3m</string>
+    <string name="kawaii_manual_faq_title" translatable="false">こまったとき</string>
+    <string name="kawaii_manual_q1" translatable="false">「あれれ？」って出たよ</string>
+    <string name="kawaii_manual_a1" translatable="false">ピントが合わなかったので、その回はスキップしたよ。明るい場所で、顔をカメラに向けてみてね。スキップも1回に数えるよ。</string>
+    <string name="kawaii_manual_q2" translatable="false">音が聞こえない</string>
+    <string name="kawaii_manual_a2" translatable="false">スマホのアラーム音量を上げてみてね。おやすみモード中は鳴らないこともあるよ。</string>
+    <string name="kawaii_manual_q3" translatable="false">途中でやめたい</string>
+    <string name="kawaii_manual_a3" translatable="false">いつでも「ストップ」を押してね。スマホの通知からも止められるよ。</string>
+    <string name="kawaii_manual_q4" translatable="false">カメラがつながらない</string>
+    <string name="kawaii_manual_a4" translatable="false">カメラの「Bluetoothリモコン」がONか確認してね。それでもダメなら「カメラ接続」タブのヘルプを見てね。</string>
+    <string name="kawaii_manual_q5" translatable="false">何枚撮れたの？</string>
+    <string name="kawaii_manual_a5" translatable="false">アプリが数えているのは、シャッターを押した回数だよ。撮れた写真はカメラで確認してね。</string>
+    <string name="kawaii_manual_footer" translatable="false">待ち時間や回数を変えたいときは、「設定」でシンプルモードに切り替えてね</string>
     <string-array name="kawaii_poses" translatable="false">
         <item>ピース！</item>
         <item>ダブルピース！</item>

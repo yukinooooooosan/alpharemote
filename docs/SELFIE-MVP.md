@@ -89,6 +89,7 @@ kawaiiスキンのSELFIEは、プリクラ風の演出をする別画面 `ui/sel
 - ポーズ（32種）と褒め言葉（20種）の抽選、音声の合図はService側の `selfie/SelfieShow.kt` が行い、`AlphaRemoteService.selfieShowState` で画面へ配る。画面と声は同じIDを使う。撮影制御の状態を見るだけで、撮影タイミングは変えない。
 - 音声は `selfie/SelfieVoice.kt` が `res/raw/kw_*.ogg` を1チャンネルで再生する。音声ファイルが無い間は何も鳴らさず、従来の電子音が鳴る。台本・タイミング・再生ルールは [KAWAII-VOICE-SCRIPT.md](KAWAII-VOICE-SCRIPT.md)。
 - 表示はシャッター操作の回数（「5かい中 4かい パシャッ！」）で、保存された写真の枚数とは言わない。
+- 取説タブはkawaiiのとき「あそびかた」（`ui/manual/KawaiiManualScreen.kt`）に切り替わる。固定の流れ（5回・1枚撮り・初回10秒／以降5秒・スマホを自分に向ける）だけを4ステップと置き方のイラスト、5つのQ&A（あれれ・音・ストップ・接続・回数）で説明する。細かい設定はシンプルモードの案内に回す。
 - 見出しの書体は Mochiy Pop One（SIL OFL 1.1）。kawaiiの文言で使う文字だけに絞った約100KBのサブセットを `res/font/mochiy_pop_one.ttf` に同梱し、ライセンスは `assets/licenses/MochiyPopOne-OFL.txt`。文言に新しい漢字を足したら `tools/subset_kawaii_font.py` で作り直す（未収録の文字は端末の書体で表示される）。
 
 ## ビルド

@@ -17,6 +17,7 @@ import org.robolectric.annotation.GraphicsMode
 import org.staacks.alpharemote.ui.about.AboutScreen
 import org.staacks.alpharemote.ui.appearance.AppSkin
 import org.staacks.alpharemote.ui.components.ConnectionPreviewSamples
+import org.staacks.alpharemote.ui.manual.KawaiiManualScreen
 import org.staacks.alpharemote.ui.manual.ManualScreen
 import org.staacks.alpharemote.ui.selfie.KawaiiPreviewSamples
 import org.staacks.alpharemote.ui.selfie.KawaiiSelfieScreen
@@ -46,7 +47,7 @@ class ComposeRenderTest {
                 // Each capture starts at the top, as in a fresh IDE preview.
                 key(page.value, dark.value, skin.value) {
                     when (page.value) {
-                        "manual" -> ManualScreen()
+                        "manual" -> if (skin.value == AppSkin.KAWAII) KawaiiManualScreen() else ManualScreen()
                         "about" -> AboutScreen("0.1.7", 8, {}, {}, skin = skin.value)
                         "connection" -> ConnectionScreen(ConnectionPreviewSamples.ready, {})
                         else -> if (skin.value == AppSkin.KAWAII) KawaiiSelfieScreen(kawaii.value.state, kawaii.value.show, {})

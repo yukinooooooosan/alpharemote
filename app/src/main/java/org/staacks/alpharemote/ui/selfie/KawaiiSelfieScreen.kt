@@ -142,13 +142,15 @@ internal fun kawaiiScene(state: SelfieUiState, show: SelfieShowState): KawaiiSce
     }
 }
 
-private object Kawaii {
+/** kawaii palette, fonts and shapes; shared with the kawaii manual. */
+internal object Kawaii {
     val Pink = Color(0xFFFF2E93)
     val Plum = Color(0xFF3B1030)
     val DeepPlum = Color(0xFF7A1F5C)
     val Yellow = Color(0xFFFFE14D)
     val Sky = Color(0xFF7CC8F5)
     val Purple = Color(0xFF8B5CF6)
+    val Orange = Color(0xFFFF5A36)
     val Lilac = Color(0xFF6B4A8E)
     val Teal = Color(0xFF0E9F8E)
     val Green = Color(0xFF22B573)
@@ -175,11 +177,11 @@ private fun sceneColor(scene: KawaiiScene, tick: Int): Color = when (scene) {
 private fun dpSp(value: Dp): TextUnit = with(LocalDensity.current) { value.toSp() }
 
 @Composable
-private fun InfiniteTransition.wave(label: String, from: Float, to: Float, millis: Int): State<Float> =
+internal fun InfiniteTransition.wave(label: String, from: Float, to: Float, millis: Int): State<Float> =
     animateFloatLoop(this, label, from, to, millis, RepeatMode.Reverse, FastOutSlowInEasing)
 
 @Composable
-private fun animateFloatLoop(loop: InfiniteTransition, label: String, from: Float, to: Float, millis: Int,
+internal fun animateFloatLoop(loop: InfiniteTransition, label: String, from: Float, to: Float, millis: Int,
                              mode: RepeatMode, easing: Easing): State<Float> =
     loop.animateFloat(from, to, infiniteRepeatable(tween(millis, easing = easing), mode), label = label)
 
@@ -204,7 +206,7 @@ private fun IdleScene(connected: Boolean, loop: InfiniteTransition) {
         KawaiiLogo(loop, Modifier.padding(bottom = 16.dp))
         StickerText(stringResource(R.string.kawaii_title), dpSp(52.dp), Kawaii.Pink, tag = "kawaii_headline", stroke = 11.dp,
             modifier = Modifier.graphicsLayer { translationY = bob.value * 8.dp.toPx(); rotationZ = bob.value * -4f })
-        Pill(stringResource(if (connected) R.string.kawaii_place_phone else R.string.kawaii_connect_first))
+        KawaiiPill(stringResource(if (connected) R.string.kawaii_place_phone else R.string.kawaii_connect_first))
         Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
             Chip(stringResource(R.string.kawaii_chip_count), Kawaii.Pink, -4f)
             Chip(stringResource(R.string.kawaii_chip_single), Kawaii.Purple, 3f)
@@ -261,7 +263,7 @@ private fun CountdownScene(state: SelfieUiState, show: SelfieShowState, loop: In
                 rotationZ = (1f - v) * 16f * sign
                 alpha = v.coerceIn(0f, 1f)
             })
-        Pill(stringResource(if (first) R.string.kawaii_caption_first else R.string.kawaii_caption))
+        KawaiiPill(stringResource(if (first) R.string.kawaii_caption_first else R.string.kawaii_caption))
     }
 }
 
@@ -356,7 +358,7 @@ private fun FailScene(loop: InfiniteTransition) {
                 }
             }
         }
-        Pill(stringResource(R.string.kawaii_fail_sub))
+        KawaiiPill(stringResource(R.string.kawaii_fail_sub))
         Text(stringResource(R.string.kawaii_fail_skip),
             Modifier.graphicsLayer { rotationZ = -3f }
                 .background(Kawaii.Plum, RoundedCornerShape(18.dp)).padding(bottom = 5.dp)
@@ -390,12 +392,12 @@ private fun DoneScene(state: SelfieUiState, loop: InfiniteTransition) {
 private fun MessageScene(title: String, body: String, color: Color) {
     Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(18.dp)) {
         StickerText(title, dpSp(52.dp), color, tag = "kawaii_headline", stroke = 12.dp, shadow = null)
-        Pill(body)
+        KawaiiPill(body)
     }
 }
 
 @Composable
-private fun rememberBob(loop: InfiniteTransition): State<Float> = loop.wave("bob", -1f, 1f, 1200)
+internal fun rememberBob(loop: InfiniteTransition): State<Float> = loop.wave("bob", -1f, 1f, 1200)
 
 /** App logo (kawaii): "Selfie Remote" sticker text with a separate balloon S tucked underneath. */
 @Composable
@@ -424,7 +426,7 @@ private fun KawaiiLogo(loop: InfiniteTransition, modifier: Modifier = Modifier) 
 
 /** Purikura sticker lettering: a white outline with a drop shadow behind the fill. */
 @Composable
-private fun StickerText(text: String, size: TextUnit, color: Color, modifier: Modifier = Modifier, tag: String? = null,
+internal fun StickerText(text: String, size: TextUnit, color: Color, modifier: Modifier = Modifier, tag: String? = null,
                         stroke: Dp = 10.dp, shadow: Color? = Kawaii.DeepPlum, lineHeight: Float = 1.1f,
                         align: TextAlign = TextAlign.Center) {
     val strokePx = with(LocalDensity.current) { stroke.toPx() }
@@ -438,7 +440,7 @@ private fun StickerText(text: String, size: TextUnit, color: Color, modifier: Mo
 }
 
 @Composable
-private fun StickerCard(modifier: Modifier = Modifier, content: @Composable ColumnScope.() -> Unit) {
+internal fun StickerCard(modifier: Modifier = Modifier, content: @Composable ColumnScope.() -> Unit) {
     val shape = RoundedCornerShape(28.dp)
     Column(modifier.background(Kawaii.Plum, shape).padding(bottom = 6.dp)
         .background(Color.White, shape).border(BorderStroke(5.dp, Kawaii.Plum), shape)
@@ -447,7 +449,7 @@ private fun StickerCard(modifier: Modifier = Modifier, content: @Composable Colu
 }
 
 @Composable
-private fun Pill(text: String) {
+internal fun KawaiiPill(text: String) {
     Text(text, Modifier.background(Color.White.copy(alpha = .88f), RoundedCornerShape(50)).padding(horizontal = 16.dp, vertical = 7.dp),
         color = Kawaii.Plum, fontWeight = FontWeight.Black, fontSize = 17.sp, textAlign = TextAlign.Center)
 }
@@ -561,7 +563,7 @@ private fun Ribbon(loop: InfiniteTransition, modifier: Modifier = Modifier) {
 }
 
 @Composable
-private fun StitchedFrame() {
+internal fun StitchedFrame() {
     Canvas(Modifier.fillMaxSize().clearAndSetSemantics {}) {
         val inset = 12.dp.toPx()
         drawRoundRect(Color.White, topLeft = Offset(inset, inset), size = Size(size.width - inset * 2, size.height - inset * 2),
@@ -613,7 +615,7 @@ private fun Flash() {
     Box(Modifier.fillMaxSize().graphicsLayer { this.alpha = alpha.value }.background(Color.White).clearAndSetSemantics {})
 }
 
-private fun DrawScope.polkaDots(color: Color) {
+internal fun DrawScope.polkaDots(color: Color) {
     drawRect(color)
     val step = 40.dp.toPx()
     val radius = step * 0.17f
@@ -631,7 +633,7 @@ private fun DrawScope.polkaDots(color: Color) {
     }
 }
 
-private fun DrawScope.star(center: Offset, radius: Float, color: Color) {
+internal fun DrawScope.star(center: Offset, radius: Float, color: Color) {
     val path = Path().apply {
         moveTo(center.x, center.y - radius)
         quadraticTo(center.x, center.y, center.x + radius, center.y)
